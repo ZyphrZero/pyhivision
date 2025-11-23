@@ -11,6 +11,7 @@ global-exclude *.py[cod]
 global-exclude __pycache__
 global-exclude *.so
 global-exclude .DS_Store
+global-exclude *.md
 
 # 排除测试和开发文件
 prune tests
