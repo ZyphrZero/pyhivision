@@ -2,13 +2,13 @@
 
 <div align="center">
 
+![pyhivision](https://socialify.git.ci/ZyphrZero/pyhivision/image?description=1&font=Jost&issues=1&language=1&name=1&owner=1&pattern=Signal&stargazers=1&theme=Dark)
+
 **高性能异步证件照处理 SDK**
 
 [![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Code style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
-
-[English](#) | [简体中文](#)
 
 </div>
 
