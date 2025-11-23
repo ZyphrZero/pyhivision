@@ -315,10 +315,11 @@ result.processing_time_ms  # 处理耗时（毫秒）
 
 #### 抠图模型
 
-- `modnet_photographic` - 通用摄影抠图
+- `modnet_photographic` - 通用摄影抠图（官方权重）
 - `hivision_modnet` - HiVision 优化版
 - `birefnet_lite` - BiRefNet 轻量版
 - `rmbg_1_4` - RMBG 1.4 版本
+- `rmbg_2.0` - RMBG 2.0 版本（待支持）
 
 #### 人脸检测模型
 
@@ -346,35 +347,6 @@ result.processing_time_ms  # 处理耗时（毫秒）
 
 ---
 
-## 📄 许可证
-
-本项目采用 **Apache License 2.0** 开源协议。
-
-这意味着您可以自由地：
-- ✅ 使用、研究、修改和分发本软件
-- ✅ 将本软件用于商业用途
-- ✅ 基于本软件创建衍生作品
-- ✅ 在私有项目中使用，无需公开源代码
-
-但您需要遵守以下条款：
-- ⚠️ 必须在修改的文件中说明您所做的更改
-- ⚠️ 必须保留原始的版权声明和许可证声明
-- ⚠️ 如果提供了 NOTICE 文件，必须包含其副本
-- ⚠️ 不能使用项目的商标、logo 或名称进行背书
-
-详细信息请参阅 [LICENSE](LICENSE) 文件或访问 https://www.apache.org/licenses/LICENSE-2.0
-
----
-
-## 🔗 相关链接
-
-- **GitHub 仓库**: https://github.com/ZyphrZero/pyhivision
-- **问题跟踪**: https://github.com/ZyphrZero/pyhivision/issues
-- **更新日志**: [CHANGELOG.md](CHANGELOG.md)
-- **贡献指南**: [CONTRIBUTING.md](CONTRIBUTING.md)
-
----
-
 ## 🙏 致谢
 - [HiVision 证件照项目](https://github.com/Zeyi-Lin/HivisionIDPhotos) - HiVision 证件照项目
 - [ModNet](https://github.com/ZHKKKe/MODNet) - 高性能人像抠图模型
@@ -398,3 +370,9 @@ result.processing_time_ms  # 处理耗时（毫秒）
 ⭐ 如果这个项目对你有帮助，请给我们一个 Star！
 
 </div>
+
+---
+
+## 📄 许可证
+
+本项目采用 **Apache License 2.0** 开源协议。
