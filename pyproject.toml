@@ -1,0 +1,63 @@
+[project]
+name = "pyhivision"
+version = "1.0.0"
+description = "高性能异步证件照处理 SDK"
+authors = [{ name = "FastParse Team" }]
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.11,<3.13"
+keywords = ["id-photo", "matting", "face-detection", "ai", "async"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "pydantic>=2.0.0,<3.0.0",
+    "pydantic-settings>=2.0.0,<3.0.0",
+    "opencv-python>=4.8.0",
+    "pillow>=9.5.0",
+    "numpy>=2.0.0,<3.0",
+    "onnxruntime>=1.23.2",
+    "mtcnn-runtime>=1.0.0",
+    "loguru>=0.7.0",
+]
+
+[project.urls]
+Repository = "https://github.com/ZyphrZero/pyhivision"
+Issues = "https://github.com/ZyphrZero/pyhivision/issues"
+
+[project.optional-dependencies]
+gpu = ["onnxruntime-gpu>=1.23.2"]
+dev = [
+    "ruff>=0.8.0",
+    "pytest>=9.0.1",
+    "pytest-asyncio>=1.3.0",
+    "pytest-cov>=7.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["pyhivision"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-v --cov=pyhivision"
+
+[tool.coverage.run]
+source = ["pyhivision"]
+omit = ["*/tests/*"]

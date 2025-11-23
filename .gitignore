@@ -1,18 +1,19 @@
 #custom.gitignore for Python projects
+/.claude
+CLAUDE.md
+/.codex
+AGENTS.md
+/.gemini
+GEMINI.md
+/.idea
+/.vscode
+
 .DS_Store
 .env
 .env.local
 *.tsbuildinfo
 *.sqlite3
 .npmrc
-CLAUDE.md
-AGENTS.md
-GEMINI.md
-/.claude
-/.codex
-/.gemini
-/.idea
-/.vscode
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

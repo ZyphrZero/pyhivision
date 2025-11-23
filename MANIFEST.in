@@ -1,0 +1,22 @@
+# 包含资源文件和文档
+include README.md
+include LICENSE
+include pyproject.toml
+
+# 包含配置文件
+recursive-include pyhivision *.json *.yaml *.yml
+
+# 排除不需要的文件
+global-exclude *.py[cod]
+global-exclude __pycache__
+global-exclude *.so
+global-exclude .DS_Store
+
+# 排除测试和开发文件
+prune tests
+prune examples
+prune docs
+prune .git
+prune .github
+prune .pytest_cache
+prune .mypy_cache
