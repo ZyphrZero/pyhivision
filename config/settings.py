@@ -23,7 +23,6 @@ from typing import Literal
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
 # ========== 默认模型文件名配置 ==========
 
 DEFAULT_MATTING_MODEL_FILES = {
@@ -57,7 +56,6 @@ class HivisionSettings(BaseSettings):
     enable_gpu: bool = Field(default=False, description="是否启用 GPU 加速")
     num_threads: int = Field(default=4, ge=1, le=32, description="ONNX Runtime 线程数")
     model_cache_size: int = Field(default=3, ge=1, le=10, description="模型缓存数量上限")
-    model_ttl_minutes: int = Field(default=10, ge=1, le=60, description="模型缓存 TTL (分钟)")
 
     # 图像处理配置
     max_image_size: int = Field(default=2000, ge=500, le=4000, description="图像最大边长")

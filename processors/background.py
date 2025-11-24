@@ -11,7 +11,7 @@ import numpy as np
 class BackgroundProcessor:
     """背景处理器"""
 
-    async def add_background(
+    def add_background(
         self,
         image: np.ndarray,
         color: tuple[int, int, int],
@@ -42,7 +42,7 @@ class BackgroundProcessor:
 
         return result
 
-    async def add_gradient_background(
+    def add_gradient_background(
         self,
         image: np.ndarray,
         start_color: tuple[int, int, int],
@@ -101,7 +101,7 @@ class BackgroundProcessor:
         background = start + gradient * (end - start)
         return background.astype(np.uint8)
 
-    async def add_image_background(
+    def add_image_background(
         self,
         image: np.ndarray,
         background_image: np.ndarray,

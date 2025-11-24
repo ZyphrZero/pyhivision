@@ -30,7 +30,7 @@ class AdjustmentProcessor:
             self._settings = create_settings()
         return self._settings
 
-    async def process(
+    def process(
         self,
         image: np.ndarray,
         face_info: FaceInfo,

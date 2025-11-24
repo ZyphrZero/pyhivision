@@ -50,7 +50,7 @@ class TemplateProcessor:
 
         return self._config
 
-    async def generate_template_photo(
+    def generate_template_photo(
         self,
         template_name: str,
         input_image: np.ndarray,

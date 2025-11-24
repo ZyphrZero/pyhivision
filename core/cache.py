@@ -21,16 +21,16 @@ logger = get_logger("core.cache")
 class CacheBackend:
     """缓存后端基类"""
 
-    async def get(self, key: str) -> Any | None:
+    def get(self, key: str) -> Any | None:
         raise NotImplementedError
 
-    async def set(self, key: str, value: Any, ttl: int | None = None) -> None:
+    def set(self, key: str, value: Any, ttl: int | None = None) -> None:
         raise NotImplementedError
 
-    async def delete(self, key: str) -> bool:
+    def delete(self, key: str) -> bool:
         raise NotImplementedError
 
-    async def clear(self) -> int:
+    def clear(self) -> int:
         raise NotImplementedError
 
 
@@ -43,7 +43,7 @@ class MemoryCache(CacheBackend):
         self._hits = 0
         self._misses = 0
 
-    async def get(self, key: str) -> Any | None:
+    def get(self, key: str) -> Any | None:
         if key not in self._cache:
             self._misses += 1
             return None
@@ -62,7 +62,7 @@ class MemoryCache(CacheBackend):
 
         return value
 
-    async def set(self, key: str, value: Any, ttl: int | None = None) -> None:
+    def set(self, key: str, value: Any, ttl: int | None = None) -> None:
         # 淘汰旧条目
         while len(self._cache) >= self._max_size:
             self._cache.popitem(last=False)
@@ -70,13 +70,13 @@ class MemoryCache(CacheBackend):
         expire_at = time.time() + ttl if ttl else None
         self._cache[key] = (value, expire_at)
 
-    async def delete(self, key: str) -> bool:
+    def delete(self, key: str) -> bool:
         if key in self._cache:
             del self._cache[key]
             return True
         return False
 
-    async def clear(self) -> int:
+    def clear(self) -> int:
         count = len(self._cache)
         self._cache.clear()
         return count
@@ -134,13 +134,13 @@ class ResultCache:
 
         return f"result:{image_hash}:{params_hash}"
 
-    async def get(self, image: np.ndarray, params: dict) -> Any | None:
+    def get(self, image: np.ndarray, params: dict) -> Any | None:
         """获取缓存结果"""
         if not self._enabled:
             return None
 
         key = self._compute_key(image, params)
-        cached = await self._backend.get(key)
+        cached = self._backend.get(key)
 
         if cached:
             logger.debug(f"Cache hit for key: {key[:16]}...")
@@ -148,7 +148,7 @@ class ResultCache:
 
         return None
 
-    async def set(self, image: np.ndarray, params: dict, result: Any) -> None:
+    def set(self, image: np.ndarray, params: dict, result: Any) -> None:
         """设置缓存结果"""
         if not self._enabled:
             return
@@ -156,12 +156,12 @@ class ResultCache:
         key = self._compute_key(image, params)
         value = pickle.dumps(result)
 
-        await self._backend.set(key, value, ttl=self._cache_ttl)
+        self._backend.set(key, value, ttl=self._cache_ttl)
         logger.debug(f"Cached result for key: {key[:16]}...")
 
-    async def clear(self) -> int:
+    def clear(self) -> int:
         """清空缓存"""
-        return await self._backend.clear()
+        return self._backend.clear()
 
     def get_stats(self) -> dict[str, Any]:
         """获取缓存统计"""

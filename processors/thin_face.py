@@ -110,7 +110,7 @@ class ThinFaceProcessor:
 
         return result
 
-    async def process(
+    def process(
         self,
         image: np.ndarray,
         face_info: FaceInfo,
@@ -138,7 +138,7 @@ class ThinFaceProcessor:
 
         Examples:
             >>> processor = ThinFaceProcessor()
-            >>> result = await processor.process(image, face_info, strength=3.0)
+            >>> result = processor.process(image, face_info, strength=3.0)
         """
         if strength <= 0.0:
             logger.debug("Thin face strength <= 0, skipping")

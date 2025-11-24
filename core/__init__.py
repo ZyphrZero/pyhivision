@@ -2,14 +2,12 @@
 
 """Core components"""
 from core.cache import ResultCache
-from core.metrics import MetricsCollector
 from core.model_manager import ModelManager
-from core.pipeline import AsyncPhotoPipeline, IDPhotoSDK
+from core.pipeline import IDPhotoSDK, PhotoPipeline
 
 __all__ = [
     'ModelManager',
-    'AsyncPhotoPipeline',
+    'PhotoPipeline',
     'IDPhotoSDK',
-    'MetricsCollector',
     'ResultCache',
 ]

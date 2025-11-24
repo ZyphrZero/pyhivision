@@ -91,7 +91,7 @@ class BeautyProcessor:
         else:
             raise FileNotFoundError(f"LUT image not found: {lut_path}")
 
-    async def process(
+    def process(
         self,
         image: np.ndarray,
         params: BeautyParams,

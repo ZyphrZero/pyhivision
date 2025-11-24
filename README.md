@@ -4,11 +4,14 @@
 
 ![pyhivision](https://socialify.git.ci/ZyphrZero/pyhivision/image?description=1&font=Jost&issues=1&language=1&name=1&owner=1&pattern=Signal&stargazers=1&theme=Dark)
 
-**高性能异步证件照处理 SDK**
+<h3>PyHiVision 证件照处理 SDK</h3>
 
 [![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg)](https://www.python.org/)
+[![Version](https://img.shields.io/badge/version-2.0.0-green.svg)](https://github.com/ZyphrZero/pyhivision/releases)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Code style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+
+[快速开始](#-快速开始) • [配置说明](#️-配置说明) • [API 文档](#-api-文档) • [贡献指南](#-贡献指南)
 
 </div>
 
@@ -16,26 +19,36 @@
 
 ## 📖 简介
 
-PyHiVision 是一个专业级的异步证件照处理 SDK，采用现代 Python 异步架构（asyncio），集成多种先进的 AI 模型，为证件照制作、人像处理和批量照片编辑提供完整的解决方案。
+PyHiVision 是一个专业级的证件照处理 SDK，集成多种先进的 AI 模型，为证件照制作、人像处理和批量照片编辑提供完整的解决方案。
+
+<table>
+<tr>
+<td width="50%">
 
 ### ✨ 核心特性
 
-- 🚀 **高性能异步架构** - 基于 asyncio 的异步处理管线，支持高并发场景
-- 🤖 **多模型支持** - 集成 ModNet、BiRefNet、RMBG、MTCNN、RetinaFace 等多种 AI 模型
-- 🎨 **完整处理流程** - 抠图 → 人脸检测 → 美颜 → 布局调整 → 背景替换
-- 💾 **智能模型管理** - LRU 缓存策略，自动内存管理
-- ⚡ **GPU 加速** - 支持 CUDA 加速，显著提升处理速度
-- 🔧 **灵活配置** - 支持环境变量、配置文件和代码配置
-- 📊 **性能监控** - 内置指标收集与性能追踪
-- 🛡️ **类型安全** - 完整的类型注解与 Pydantic 数据验证
+- 🚀 **高性能架构** - 简洁高效的同步处理管线
+- 🤖 **多模型支持** - ModNet、BiRefNet、RMBG、MTCNN、RetinaFace
+- 🎨 **完整流程** - 抠图 → 检测 → 美颜 → 调整 → 背景
+- 💾 **智能管理** - LRU 缓存，自动内存管理
+- ⚡ **GPU 加速** - CUDA 加速，线程池优化
+- 🔧 **灵活配置** - 环境变量、配置文件、代码配置
+- 🛡️ **类型安全** - 完整类型注解与数据验证
+
+</td>
+<td width="50%">
 
 ### 🎯 适用场景
 
-- 证件照在线制作平台
-- 批量人像照片处理系统
-- 人脸识别与美颜应用
-- 图像自动化处理服务
-- AI 驱动的图像编辑工具
+- 📸 证件照在线制作平台
+- 🖼️ 批量人像照片处理系统
+- 👤 人脸识别与美颜应用
+- 🤖 图像自动化处理服务
+- 🎨 AI 驱动的图像编辑工具
+
+</td>
+</tr>
+</table>
 
 ---
 
@@ -58,11 +71,10 @@ pip install "pyhivision[gpu]"
 
 ```python
 import cv2
-import asyncio
 from pyhivision import IDPhotoSDK, PhotoRequest, create_settings
 
-async def main():
-    # ⚠️ 配置模型路径（由上层应用提供）
+def main():
+    # 配置模型路径
     settings = create_settings(
         matting_models_dir="~/.pyhivision/models/matting",
         detection_models_dir="~/.pyhivision/models/detection",  # MTCNN 不需要
@@ -84,17 +96,17 @@ async def main():
     )
 
     # 处理图像
-    result = await sdk.process_single(request)
+    result = sdk.process_single(request)
 
     # 保存结果
     cv2.imwrite("standard.jpg", result.standard)
     if result.hd is not None:
         cv2.imwrite("hd.jpg", result.hd)
 
-    print(f"✅ 处理完成，耗时：{result.processing_time_ms:.2f}ms")
+    print(f"✅ 处理完成")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
 ```
 
 ---
@@ -108,7 +120,7 @@ from pyhivision import create_settings
 
 # 基础配置
 settings = create_settings(
-    # ⚠️ 模型路径（必需，由上层应用提供）
+    # 模型路径（必需）
     matting_models_dir="~/.pyhivision/models/matting",      # 抠图模型目录
     detection_models_dir="~/.pyhivision/models/detection",  # 检测模型目录（MTCNN 除外）
 
@@ -146,17 +158,62 @@ export HIVISION_LOG_LEVEL=DEBUG
 
 ### 主要配置项
 
-| 配置项 | 类型 | 默认值 | 说明 |
-|-------|------|--------|------|
-| `matting_models_dir` ⚠️ | Path/str/None | None | **抠图模型目录（必需）** |
-| `detection_models_dir` | Path/str/None | None | **检测模型目录**（MTCNN 除外） |
-| `enable_gpu` | bool | False | 是否启用 GPU 加速 |
-| `num_threads` | int | 4 | ONNX Runtime 线程数 |
-| `model_cache_size` | int | 3 | 模型缓存数量上限 |
-| `max_image_size` | int | 2000 | 图像最大边长 |
-| `log_level` | str | "INFO" | 日志级别 |
+<table>
+<thead>
+<tr>
+<th width="25%">配置项</th>
+<th width="20%">类型</th>
+<th width="15%">默认值</th>
+<th width="40%">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>matting_models_dir</code></td>
+<td>Path/str/None</td>
+<td>None</td>
+<td><strong>⚠️ 抠图模型目录（必需）</strong></td>
+</tr>
+<tr>
+<td><code>detection_models_dir</code></td>
+<td>Path/str/None</td>
+<td>None</td>
+<td>检测模型目录（MTCNN 除外）</td>
+</tr>
+<tr>
+<td><code>enable_gpu</code></td>
+<td>bool</td>
+<td>False</td>
+<td>是否启用 GPU 加速</td>
+</tr>
+<tr>
+<td><code>num_threads</code></td>
+<td>int</td>
+<td>4</td>
+<td>ONNX Runtime 线程数</td>
+</tr>
+<tr>
+<td><code>model_cache_size</code></td>
+<td>int</td>
+<td>3</td>
+<td>模型缓存数量上限</td>
+</tr>
+<tr>
+<td><code>max_image_size</code></td>
+<td>int</td>
+<td>2000</td>
+<td>图像最大边长</td>
+</tr>
+<tr>
+<td><code>log_level</code></td>
+<td>str</td>
+<td>"INFO"</td>
+<td>日志级别</td>
+</tr>
+</tbody>
+</table>
 
-> ⚠️ **重要说明**：模型路径由上层应用控制，SDK 不提供默认路径。推荐使用用户目录：`~/.pyhivision/models/`
+> 💡 **提示**：模型路径由上层应用控制，SDK 不提供默认路径。推荐使用用户目录：`~/.pyhivision/models/`
 
 ---
 
@@ -167,7 +224,7 @@ export HIVISION_LOG_LEVEL=DEBUG
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                     用户层 (User Layer)                      │
-│  IDPhotoSDK.process() / AsyncPhotoPipeline.process_single() │
+│         IDPhotoSDK.process() / PhotoPipeline                │
 └────────────────────────┬────────────────────────────────────┘
                          │
                          ▼
@@ -185,10 +242,10 @@ export HIVISION_LOG_LEVEL=DEBUG
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                 底层服务 (Infrastructure)                    │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
-│  │ ModelManager │  │ MetricsCollec│  │ ResultCache  │     │
-│  │ (模型管理)    │  │ (性能监控)    │  │ (结果缓存)    │     │
-│  └──────────────┘  └──────────────┘  └──────────────┘     │
+│  ┌──────────────┐  ┌──────────────┐                        │
+│  │ ModelManager │  │ ResultCache  │                        │
+│  │ (模型管理)    │  │ (结果缓存)    │                        │
+│  └──────────────┘  └──────────────┘                        │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -240,9 +297,6 @@ ruff check .
 
 # 自动修复
 ruff check --fix .
-
-# 类型检查
-mypy pyhivision
 ```
 
 ### 测试
@@ -264,7 +318,6 @@ pytest tests/test_pipeline.py -v
 - **函数/变量**: snake_case（如 `load_model`, `face_info`）
 - **常量**: UPPER_SNAKE_CASE（如 `CUBE64_SIZE`）
 - **私有方法**: 前缀 `_`（如 `_create_session`）
-- **异步函数**: 必须使用 `async def`
 - **错误处理**: 使用自定义异常类（继承自 `HivisionError`）
 
 ---
@@ -279,7 +332,7 @@ pytest tests/test_pipeline.py -v
 
 ```python
 sdk = IDPhotoSDK.create(settings=settings)
-result = await sdk.process_single(request)
+result = sdk.process_single(request)
 ```
 
 #### `PhotoRequest`
@@ -294,8 +347,8 @@ request = PhotoRequest(
     matting_model="modnet_photographic",  # 抠图模型
     detection_model="mtcnn",              # 检测模型
     beauty_params=BeautyParams(           # 美颜参数（可选）
-        brightness=1.1,
-        contrast=1.05
+        brightness=10,
+        contrast=5
     )
 )
 ```
@@ -308,23 +361,36 @@ request = PhotoRequest(
 result.standard         # 标准照片（np.ndarray）
 result.hd              # 高清照片（可选）
 result.face_info       # 人脸信息
-result.processing_time_ms  # 处理耗时（毫秒）
 ```
 
 ### 支持的模型
 
-#### 抠图模型
+<table>
+<tr>
+<td width="50%">
 
-- `modnet_photographic` - 通用摄影抠图（官方权重）
-- `hivision_modnet` - HiVision 优化版
-- `birefnet_lite` - BiRefNet 轻量版
-- `rmbg_1_4` - RMBG 1.4 版本
-- `rmbg_2.0` - RMBG 2.0 版本（待支持）
+#### 🎨 抠图模型
 
-#### 人脸检测模型
+| 模型名称 | 说明 |
+|---------|------|
+| `modnet_photographic` | 通用摄影抠图（官方权重） |
+| `hivision_modnet` | HiVision 优化版 |
+| `birefnet_lite` | BiRefNet 轻量版 |
+| `rmbg_1_4` | RMBG 1.4 版本 |
 
-- `mtcnn` - MTCNN（内置权重，无需额外配置）
-- `retinaface` - RetinaFace（需要配置 detection_models_dir）
+</td>
+<td width="50%">
+
+#### 👤 人脸检测模型
+
+| 模型名称 | 说明 |
+|---------|------|
+| `mtcnn` | MTCNN（内置权重） ✅ |
+| `retinaface` | RetinaFace（需配置路径） |
+
+</td>
+</tr>
+</table>
 
 ---
 
@@ -348,6 +414,7 @@ result.processing_time_ms  # 处理耗时（毫秒）
 ---
 
 ## 🙏 致谢
+
 - [HiVision 证件照项目](https://github.com/Zeyi-Lin/HivisionIDPhotos) - HiVision 证件照项目
 - [ModNet](https://github.com/ZHKKKe/MODNet) - 高性能人像抠图模型
 - [BiRefNet](https://github.com/ZhengPeng7/BiRefNet) - 高精度背景移除模型

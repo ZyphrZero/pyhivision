@@ -45,7 +45,7 @@ class MattingProcessor:
         """
         self.model_manager = model_manager
 
-    async def process(
+    def process(
         self,
         image: np.ndarray,
         model_name: MattingModelName = "modnet_photographic",
@@ -90,7 +90,7 @@ class MattingProcessor:
 
         # 执行推理
         logger.debug(f"Running matting with model: {model_name}")
-        result = await model.infer(image)
+        result = model.infer(image)
 
         return result
 

@@ -10,7 +10,6 @@
 """
 
 import logging
-import sys
 from typing import Any, Protocol
 
 
@@ -84,10 +83,10 @@ class LoguruLoggerAdapter:
             from loguru import logger
 
             self.logger = logger.bind(name=name)
-        except ImportError:
+        except ImportError as err:
             raise ImportError(
                 "loguru is not installed. Please install it with: pip install loguru"
-            )
+            ) from err
 
     def debug(self, message: str, *args: Any, **kwargs: Any) -> None:
         self.logger.debug(message, *args, **kwargs)

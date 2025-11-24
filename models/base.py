@@ -3,10 +3,8 @@
 """AI 模型基类和协议定义
 
 定义所有 AI 模型的基础接口，包括预处理、推理和后处理。
-
-- 使用 ModelManager 的专用线程池，避免线程数失控
+使用 ModelManager 的专用线程池执行 ONNX 推理。
 """
-import asyncio
 from abc import ABC, abstractmethod
 from typing import Any
 
@@ -30,7 +28,7 @@ class BaseModel(ABC):
         self.model_manager = model_manager
         self._session = None
 
-    async def get_session(self):
+    def get_session(self):
         """获取模型会话（懒加载）"""
         if self._session is None:
             self._session = self.model_manager.load_model(
@@ -41,7 +39,7 @@ class BaseModel(ABC):
         return self._session
 
     @abstractmethod
-    async def preprocess(self, image: np.ndarray) -> tuple[np.ndarray, dict[str, Any]]:
+    def preprocess(self, image: np.ndarray) -> tuple[np.ndarray, dict[str, Any]]:
         """预处理
 
         Args:
@@ -53,7 +51,7 @@ class BaseModel(ABC):
         pass
 
     @abstractmethod
-    async def postprocess(
+    def postprocess(
         self, output: np.ndarray, metadata: dict[str, Any]
     ) -> np.ndarray:
         """后处理
@@ -67,7 +65,7 @@ class BaseModel(ABC):
         """
         pass
 
-    async def infer(self, image: np.ndarray) -> np.ndarray:
+    def infer(self, image: np.ndarray) -> np.ndarray:
         """完整的推理流程
 
         Args:
@@ -76,23 +74,20 @@ class BaseModel(ABC):
         Returns:
             推理结果
         """
-        # 预处理（CPU密集但GIL部分释放）
-        input_data, metadata = await self.preprocess(image)
+        # 预处理
+        input_data, metadata = self.preprocess(image)
 
         # 获取会话
-        session = await self.get_session()
+        session = self.get_session()
 
-        # ✅ 在专用线程池中执行推理（ONNX Runtime完全释放GIL）
-        loop = asyncio.get_event_loop()
-        executor = self.model_manager.executor
-
-        output = await loop.run_in_executor(
-            executor,
-            lambda: session.run(None, {session.get_inputs()[0].name: input_data}),
+        # 在线程池中执行推理（ONNX Runtime 释放 GIL）
+        future = self.model_manager.executor.submit(
+            lambda: session.run(None, {session.get_inputs()[0].name: input_data})
         )
+        output = future.result()
 
-        # 后处理（CPU密集但GIL部分释放）
-        result = await self.postprocess(output[0], metadata)
+        # 后处理
+        result = self.postprocess(output[0], metadata)
 
         return result
 
@@ -101,29 +96,55 @@ class BaseMattingModel(BaseModel):
     """抠图模型基类"""
 
     @abstractmethod
-    async def preprocess(self, image: np.ndarray) -> tuple[np.ndarray, dict[str, Any]]:
-        """预处理图像用于抠图"""
+    def preprocess(self, image: np.ndarray) -> tuple[np.ndarray, dict[str, Any]]:
+        """预处理输入图像
+
+        Args:
+            image: BGR 图像
+
+        Returns:
+            (模型输入, 元数据)
+        """
         pass
 
     @abstractmethod
-    async def postprocess(
-        self, output: np.ndarray, metadata: dict[str, Any]
-    ) -> np.ndarray:
-        """后处理抠图结果，返回 BGRA 图像"""
+    def postprocess(self, output: np.ndarray, metadata: dict[str, Any]) -> np.ndarray:
+        """后处理模型输出
+
+        Args:
+            output: 模型输出
+            metadata: 预处理元数据
+
+        Returns:
+            BGRA 图像（带 Alpha 通道）
+        """
         pass
 
 
 class BaseDetectionModel(BaseModel):
-    """检测模型基类"""
+    """人脸检测模型基类"""
 
     @abstractmethod
-    async def detect(self, image: np.ndarray) -> Any:
-        """检测人脸
+    def preprocess(self, image: np.ndarray) -> tuple[np.ndarray, dict[str, Any]]:
+        """预处理输入图像
 
         Args:
-            image: 输入图像 (BGR 格式)
+            image: BGR 图像
 
         Returns:
-            检测结果（FaceInfo 或其他格式）
+            (模型输入, 元数据)
+        """
+        pass
+
+    @abstractmethod
+    def postprocess(self, output: np.ndarray, metadata: dict[str, Any]) -> Any:
+        """后处理模型输出
+
+        Args:
+            output: 模型输出
+            metadata: 预处理元数据
+
+        Returns:
+            检测结果
         """
         pass

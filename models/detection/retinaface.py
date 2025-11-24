@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 
-"""RetinaFace 人脸检测模型实现
-
-封装为异步接口
-"""
-import asyncio
+"""RetinaFace 人脸检测模型实现"""
 from typing import Any
 
 import cv2
@@ -18,7 +14,7 @@ from schemas.response import FaceInfo
 class RetinaFaceModel(BaseDetectionModel):
     """RetinaFace 人脸检测模型"""
 
-    async def preprocess(self, image: np.ndarray) -> tuple[np.ndarray, dict[str, Any]]:
+    def preprocess(self, image: np.ndarray) -> tuple[np.ndarray, dict[str, Any]]:
         """预处理"""
         orig_h, orig_w = image.shape[:2]
 
@@ -42,13 +38,13 @@ class RetinaFaceModel(BaseDetectionModel):
 
         return batched, metadata
 
-    async def postprocess(
+    def postprocess(
         self, output: np.ndarray, metadata: dict[str, Any]
     ) -> np.ndarray:
         """后处理"""
         return output
 
-    async def detect(self, image: np.ndarray) -> FaceInfo:
+    def detect(self, image: np.ndarray) -> FaceInfo:
         """检测人脸
 
         Args:
@@ -62,17 +58,16 @@ class RetinaFaceModel(BaseDetectionModel):
             MultipleFacesDetectedError: 检测到多个人脸
         """
         # 获取会话
-        session = await self.get_session()
+        session = self.get_session()
 
         # 预处理
-        input_data, metadata = await self.preprocess(image)
+        input_data, metadata = self.preprocess(image)
 
         # 在线程池中执行推理
-        loop = asyncio.get_event_loop()
-        outputs = await loop.run_in_executor(
-            None,
-            lambda: session.run(None, {session.get_inputs()[0].name: input_data}),
+        future = self.model_manager.executor.submit(
+            lambda: session.run(None, {session.get_inputs()[0].name: input_data})
         )
+        outputs = future.result()
 
         # 解析输出
         # RetinaFace 输出格式: [boxes, scores, landmarks]
@@ -123,6 +118,6 @@ class RetinaFaceModel(BaseDetectionModel):
             confidence=confidence,
         )
 
-    async def infer(self, image: np.ndarray) -> FaceInfo:
+    def infer(self, image: np.ndarray) -> FaceInfo:
         """推理接口（调用 detect）"""
-        return await self.detect(image)
+        return self.detect(image)

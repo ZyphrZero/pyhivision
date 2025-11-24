@@ -19,7 +19,7 @@ class LayoutProcessor:
         >>> processor = LayoutProcessor()
         >>> positions, need_rotate = processor.calculate_layout(295, 413)
         >>> photo = np.ones((413, 295, 3), dtype=np.uint8) * 255
-        >>> layout = await processor.generate_layout_image(photo, positions, need_rotate)
+        >>> layout = processor.generate_layout_image(photo, positions, need_rotate)
         >>> assert layout.shape == (1205, 1795, 3)
     """
 
@@ -184,7 +184,7 @@ class LayoutProcessor:
 
         return layout_mode, center_block_width, center_block_height
 
-    async def generate_layout_image(
+    def generate_layout_image(
         self,
         photo: np.ndarray,
         positions: list[tuple[int, int]],
@@ -208,7 +208,7 @@ class LayoutProcessor:
             >>> processor = LayoutProcessor()
             >>> photo = np.ones((413, 295, 3), dtype=np.uint8) * 255
             >>> positions, rotate = processor.calculate_layout(295, 413)
-            >>> layout = await processor.generate_layout_image(photo, positions, rotate)
+            >>> layout = processor.generate_layout_image(photo, positions, rotate)
             >>> assert layout.shape[0] == 1205
         """
         if layout_size is None:

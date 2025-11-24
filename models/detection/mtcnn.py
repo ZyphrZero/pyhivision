@@ -17,21 +17,21 @@ class MTCNNModel(BaseDetectionModel):
         super().__init__(config, model_manager)
         self._detector = None
 
-    async def get_session(self):
+    def get_session(self):
         """获取检测器实例"""
         if self._detector is None:
             self._detector = MTCNNRuntime()
         return self._detector
 
-    async def preprocess(self, image: np.ndarray) -> tuple[np.ndarray, dict]:
+    def preprocess(self, image: np.ndarray) -> tuple[np.ndarray, dict]:
         """MTCNN 不需要特殊预处理"""
         return image, {}
 
-    async def postprocess(self, output: np.ndarray, metadata: dict) -> np.ndarray:
+    def postprocess(self, output: np.ndarray, metadata: dict) -> np.ndarray:
         """MTCNN 不需要特殊后处理"""
         return output
 
-    async def detect(self, image: np.ndarray, scale: int = 2) -> FaceInfo:
+    def detect(self, image: np.ndarray, scale: int = 2) -> FaceInfo:
         """检测人脸
 
         Args:
@@ -45,15 +45,12 @@ class MTCNNModel(BaseDetectionModel):
             NoFaceDetectedError: 未检测到人脸
             MultipleFacesDetectedError: 检测到多个人脸
         """
-        detector = await self.get_session()
+        detector = self.get_session()
 
         h, w = image.shape[:2]
 
         # 缩小图像加速检测
-        if scale > 1:
-            resized = cv2.resize(image, (w // scale, h // scale))
-        else:
-            resized = image
+        resized = cv2.resize(image, (w // scale, h // scale)) if scale > 1 else image
 
         # 检测人脸
         faces, landmarks = detector.detect(resized, thresholds=[0.8, 0.8, 0.8])
@@ -100,6 +97,6 @@ class MTCNNModel(BaseDetectionModel):
             confidence=confidence,
         )
 
-    async def infer(self, image: np.ndarray) -> FaceInfo:
+    def infer(self, image: np.ndarray) -> FaceInfo:
         """推理接口（调用 detect）"""
-        return await self.detect(image)
+        return self.detect(image)

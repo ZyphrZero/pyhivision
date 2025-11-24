@@ -15,7 +15,7 @@ from models.base import BaseMattingModel
 class RMBGModel(BaseMattingModel):
     """RMBG 人像抠图模型"""
 
-    async def preprocess(self, image: np.ndarray) -> tuple[np.ndarray, dict[str, Any]]:
+    def preprocess(self, image: np.ndarray) -> tuple[np.ndarray, dict[str, Any]]:
         """预处理（[-1, 1] 归一化）
 
         Args:
@@ -54,7 +54,7 @@ class RMBGModel(BaseMattingModel):
 
         return batched, metadata
 
-    async def postprocess(
+    def postprocess(
         self, output: np.ndarray, metadata: dict[str, Any]
     ) -> np.ndarray:
         """后处理：生成 BGRA 图像
@@ -70,10 +70,7 @@ class RMBGModel(BaseMattingModel):
         orig_image = metadata["orig_image"]
 
         # 提取输出
-        if len(output.shape) == 4:
-            matte = output[0, 0, :, :]
-        else:
-            matte = output[0, :, :]
+        matte = output[0, 0, :, :] if len(output.shape) == 4 else output[0, :, :]
 
         # 确保在 [0, 1] 范围内
         matte = np.clip(matte, 0, 1)

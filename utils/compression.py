@@ -184,10 +184,9 @@ def compress_to_kb_base64(
             if img_size_kb <= target_kb or quality == 1:
                 break
 
-        elif mode == "min":
+        elif mode == "min" and img_size_kb >= target_kb:
             # 不小于目标大小
-            if img_size_kb >= target_kb:
-                break
+            break
 
         # 降低质量
         quality -= 5

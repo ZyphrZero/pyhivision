@@ -38,7 +38,7 @@ class DetectionProcessor:
         """
         self.model_manager = model_manager
 
-    async def process(
+    def process(
         self,
         image: np.ndarray,
         model_name: DetectionModelName = "mtcnn",
@@ -87,7 +87,7 @@ class DetectionProcessor:
 
         # 执行检测
         logger.debug(f"Running detection with model: {model_name}")
-        result = await model.detect(image)
+        result = model.detect(image)
 
         return result
 

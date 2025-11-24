@@ -1,12 +1,12 @@
 [project]
 name = "pyhivision"
-version = "1.0.2"
-description = "高性能异步证件照处理 SDK"
+version = "1.1.0"
+description = "高性能证件照处理 SDK"
 authors = [{ name = "FastParse Team" }]
 readme = "README.md"
 license = { text = "Apache-2.0" }
 requires-python = ">=3.11,<3.13"
-keywords = ["id-photo", "matting", "face-detection", "ai", "async"]
+keywords = ["id-photo", "matting", "face-detection", "ai"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -32,9 +32,8 @@ Issues = "https://github.com/ZyphrZero/pyhivision/issues"
 [project.optional-dependencies]
 gpu = ["onnxruntime-gpu>=1.23.2"]
 dev = [
-    "ruff>=0.8.0",
+    "ruff>=0.14.6",
     "pytest>=9.0.1",
-    "pytest-asyncio>=1.3.0",
     "pytest-cov>=7.0.0",
 ]
 
@@ -54,7 +53,6 @@ select = ["E", "F", "I", "W", "UP", "B", "SIM"]
 ignore = ["E501"]
 
 [tool.pytest.ini_options]
-asyncio_mode = "auto"
 testpaths = ["tests"]
 addopts = "-v --cov=pyhivision"
 

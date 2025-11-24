@@ -32,7 +32,7 @@ class WatermarkProcessor:
         """
         self.default_font_path = Path(default_font_path) if default_font_path else None
 
-    async def add_watermark(
+    def add_watermark(
         self,
         image: np.ndarray,
         text: str,

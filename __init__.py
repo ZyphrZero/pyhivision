@@ -1,15 +1,13 @@
 #!/usr/bin/env python
 
-"""PyHiVision
+"""PyHiVision - 高性能证件照处理 SDK"""
 
-"""
-
-__version__ = '1.0.0'
+__version__ = '1.1.0'
 __author__ = 'FastParse Team'
 
 # Core components
 from config.settings import HivisionSettings, create_settings
-from core.pipeline import AsyncPhotoPipeline, IDPhotoSDK
+from core.pipeline import IDPhotoSDK, PhotoPipeline
 
 # Exceptions
 from exceptions.errors import (
@@ -30,7 +28,7 @@ __all__ = [
     '__version__',
     # Core API
     'IDPhotoSDK',
-    'AsyncPhotoPipeline',
+    'PhotoPipeline',
     # Configuration
     'HivisionSettings',
     'create_settings',

@@ -19,7 +19,7 @@ class BiRefNetModel(BaseMattingModel):
     MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32)
     STD = np.array([0.229, 0.224, 0.225], dtype=np.float32)
 
-    async def preprocess(self, image: np.ndarray) -> tuple[np.ndarray, dict[str, Any]]:
+    def preprocess(self, image: np.ndarray) -> tuple[np.ndarray, dict[str, Any]]:
         """预处理（ImageNet 标准归一化）
 
         Args:
@@ -58,7 +58,7 @@ class BiRefNetModel(BaseMattingModel):
 
         return batched, metadata
 
-    async def postprocess(
+    def postprocess(
         self, output: np.ndarray, metadata: dict[str, Any]
     ) -> np.ndarray:
         """后处理：Sigmoid 激活 + 生成 BGRA
@@ -74,10 +74,7 @@ class BiRefNetModel(BaseMattingModel):
         orig_image = metadata["orig_image"]
 
         # 提取输出
-        if len(output.shape) == 4:
-            matte = output[0, 0, :, :]
-        else:
-            matte = output[0, :, :]
+        matte = output[0, 0, :, :] if len(output.shape) == 4 else output[0, :, :]
 
         # Sigmoid 激活
         matte = 1 / (1 + np.exp(-matte))

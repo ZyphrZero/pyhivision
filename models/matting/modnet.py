@@ -15,7 +15,7 @@ from models.base import BaseMattingModel
 class ModNetModel(BaseMattingModel):
     """ModNet 人像抠图模型"""
 
-    async def preprocess(self, image: np.ndarray) -> tuple[np.ndarray, dict[str, Any]]:
+    def preprocess(self, image: np.ndarray) -> tuple[np.ndarray, dict[str, Any]]:
         """预处理
 
         Args:
@@ -52,7 +52,7 @@ class ModNetModel(BaseMattingModel):
 
         return batched, metadata
 
-    async def postprocess(
+    def postprocess(
         self, output: np.ndarray, metadata: dict[str, Any]
     ) -> np.ndarray:
         """后处理：生成 BGRA 图像
@@ -68,10 +68,7 @@ class ModNetModel(BaseMattingModel):
         orig_image = metadata["orig_image"]
 
         # 提取 alpha 通道
-        if len(output.shape) == 4:
-            matte = output[0, 0, :, :]
-        else:
-            matte = output[0, :, :]
+        matte = output[0, 0, :, :] if len(output.shape) == 4 else output[0, :, :]
 
         # Resize 回原始尺寸
         matte = cv2.resize(matte, (orig_w, orig_h), interpolation=cv2.INTER_AREA)

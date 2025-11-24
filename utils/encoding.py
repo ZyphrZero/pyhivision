@@ -185,4 +185,4 @@ def save_numpy_image(image: np.ndarray, file_path: str) -> None:
     try:
         pil_image.save(file_path)
     except Exception as e:
-        raise IOError(f"Failed to save image to {file_path}: {e}") from e
+        raise OSError(f"Failed to save image to {file_path}: {e}") from e
