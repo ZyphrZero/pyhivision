@@ -54,6 +54,7 @@ exclude = [
     ".github/",
     ".vscode/",
     "*.md",
+    "uv.lock",
 ]
 include = [
     "pyhivision/",

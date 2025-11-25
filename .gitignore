@@ -8,6 +8,7 @@ GEMINI.md
 /.idea
 /.vscode
 /examples/output/
+uv.lock
 
 .DS_Store
 .env
