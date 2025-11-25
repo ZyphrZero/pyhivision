@@ -94,7 +94,7 @@ class PhotoPipeline:
 
     def process_single(self, request: PhotoRequest) -> PhotoResult:
         """处理单张照片
-        
+
         1. 全图抠图
         2. 检测人脸（在抠图结果上）
         3. 美颜处理

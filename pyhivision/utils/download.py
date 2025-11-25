@@ -5,11 +5,10 @@
 提供类似 Playwright 的模型自动下载功能，根据系统平台自动下载到对应目录。
 """
 import hashlib
-import platform
 import sys
 from pathlib import Path
 from typing import Literal
-from urllib.request import urlopen, Request
+from urllib.request import Request, urlopen
 
 from pyhivision.utils.logger import get_logger
 

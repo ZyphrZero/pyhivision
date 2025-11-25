@@ -59,7 +59,7 @@ def cmd_install(args):
         except Exception as e:
             print(f"  ✗ 失败: {e}")
 
-    print(f"\n✓ 常用模型下载完成，下载其他模型请指定，或使用 --all 参数下载所有模型")
+    print("\n✓ 常用模型下载完成，下载其他模型请指定，或使用 --all 参数下载所有模型")
     return 0
 
 
@@ -67,8 +67,8 @@ def cmd_list(args):
     """列出可用模型"""
     print("可用模型列表:\n")
 
-    matting_models = [k for k in MODEL_REGISTRY.keys() if k != "retinaface"]
-    detection_models = [k for k in MODEL_REGISTRY.keys() if k == "retinaface"]
+    matting_models = [k for k in MODEL_REGISTRY if k != "retinaface"]
+    detection_models = [k for k in MODEL_REGISTRY if k == "retinaface"]
 
     print("抠图模型 (Matting):")
     for name in matting_models:
@@ -80,7 +80,7 @@ def cmd_list(args):
         config = MODEL_REGISTRY[name]
         print(f"  - {name:25} {config['filename']}")
 
-    print(f"\nMTCNN 使用内置权重，无需下载")
+    print("\nMTCNN 使用内置权重，无需下载")
     return 0
 
 

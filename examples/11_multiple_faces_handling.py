@@ -12,12 +12,12 @@ from pathlib import Path
 
 import cv2
 
+from pyhivision import IDPhotoSDK, PhotoRequest, create_settings
+from pyhivision.exceptions.errors import MultipleFacesDetectedError
+
 # 添加项目根目录到路径（开发环境）
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
-
-from pyhivision import IDPhotoSDK, PhotoRequest, create_settings
-from pyhivision.exceptions.errors import MultipleFacesDetectedError
 
 
 def test_strict_mode(sdk, image):
@@ -33,7 +33,7 @@ def test_strict_mode(sdk, image):
             detection_model="mtcnn",
             multiple_faces_strategy="error",  # 严格模式：检测到多人脸时报错
         )
-        result = sdk.process_single(request)
+        sdk.process_single(request)
         print("✓ 处理成功（检测到单个人脸）")
     except MultipleFacesDetectedError as e:
         print(f"✗ 检测到多人脸！{e}")
@@ -54,7 +54,7 @@ def test_best_confidence_mode(sdk, image):
     )
     result = sdk.process_single(request)
 
-    print(f"✓ 处理成功！选择了置信度最高的人脸")
+    print("✓ 处理成功！选择了置信度最高的人脸")
     print(f"  → 人脸位置: ({result.face_info.x}, {result.face_info.y})")
     print(f"  → 人脸尺寸: {result.face_info.width}x{result.face_info.height}")
     print(f"  → 置信度: {result.face_info.confidence:.3f}")
@@ -80,7 +80,7 @@ def test_largest_area_mode(sdk, image):
     )
     result = sdk.process_single(request)
 
-    print(f"✓ 处理成功！选择了面积最大的人脸")
+    print("✓ 处理成功！选择了面积最大的人脸")
     print(f"  → 人脸位置: ({result.face_info.x}, {result.face_info.y})")
     print(f"  → 人脸尺寸: {result.face_info.width}x{result.face_info.height}")
     print(f"  → 人脸面积: {result.face_info.width * result.face_info.height}")
@@ -109,9 +109,9 @@ def test_nms_configuration(sdk, image):
 
     try:
         result = sdk.process_single(request)
-        print(f"✓ RetinaFace 处理成功！")
-        print(f"  → 置信度阈值: 0.7")
-        print(f"  → NMS IoU 阈值: 0.3")
+        print("✓ RetinaFace 处理成功！")
+        print("  → 置信度阈值: 0.7")
+        print("  → NMS IoU 阈值: 0.3")
         print(f"  → 检测到的人脸置信度: {result.face_info.confidence:.3f}")
 
         # 保存结果

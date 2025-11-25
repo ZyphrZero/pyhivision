@@ -33,7 +33,7 @@ def main():
         print(f"✓ 抠图模型: {matting_path.name}")
 
         # MTCNN 使用内置权重，无需下载
-        print(f"✓ 检测模型: MTCNN (内置)\n")
+        print("✓ 检测模型: MTCNN (内置)\n")
 
     except Exception as e:
         print(f"✗ 下载失败: {e}")
@@ -63,10 +63,10 @@ def main():
     if result.hd:
         cv2.imwrite("examples/output/13_hd.jpg", result.hd)
 
-    print(f"✓ 处理完成！")
-    print(f"  - 标准照: examples/output/13_standard.jpg")
+    print("✓ 处理完成！")
+    print("  - 标准照: examples/output/13_standard.jpg")
     if result.hd:
-        print(f"  - 高清照: examples/output/13_hd.jpg")
+        print("  - 高清照: examples/output/13_hd.jpg")
 
 
 if __name__ == "__main__":

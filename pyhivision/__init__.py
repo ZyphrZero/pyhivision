@@ -2,7 +2,7 @@
 
 """PyHiVision - 高性能证件照处理 SDK"""
 
-__version__ = '1.2.0'
+__version__ = '1.2.1'
 __author__ = 'FastParse Team'
 
 # Core components
@@ -25,7 +25,7 @@ from pyhivision.schemas.request import BeautyParams, LayoutParams, PhotoRequest
 from pyhivision.schemas.response import FaceInfo, PhotoResult
 
 # Utils
-from pyhivision.utils.download import download_model, download_all_models, get_default_models_dir
+from pyhivision.utils.download import download_all_models, download_model, get_default_models_dir
 
 __all__ = [
     '__version__',

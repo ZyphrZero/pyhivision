@@ -5,10 +5,13 @@
 定义人脸矫正相关的参数和结果模型。
 """
 
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 import numpy as np
 from pydantic import BaseModel, Field
+
+if TYPE_CHECKING:
+    from pyhivision.schemas.response import FaceInfo
 
 
 class AlignmentParams(BaseModel):
