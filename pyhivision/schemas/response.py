@@ -42,13 +42,13 @@ class PhotoResult(BaseModel):
     # 输出图像
     standard: np.ndarray = Field(..., description="标准照 (BGR)")
     hd: np.ndarray | None = Field(default=None, description="高清照 (BGR)")
-    matting: np.ndarray = Field(..., description="抠图结果 (BGRA)")
+    matting: np.ndarray | None = Field(default=None, description="抠图结果 (BGRA)")
 
     # 人脸信息
     face_info: FaceInfo | None = Field(default=None, description="人脸信息")
 
     # 处理元数据
-    processing_time_ms: float = Field(..., description="总处理时间 (毫秒)")
+    processing_time_ms: float = Field(default=0.0, description="总处理时间 (毫秒)")
     stage_times: dict[str, float] = Field(
         default_factory=dict, description="各阶段耗时 (毫秒)"
     )

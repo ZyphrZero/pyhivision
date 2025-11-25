@@ -109,7 +109,13 @@ class ModelManager:
 
         # 配置会话选项
         sess_options = ort.SessionOptions()
-        sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+        # RMBG 2.0 模型禁用图优化以避免节点名称不匹配
+        needs_disable_opt = "rmbg_2.0" in checkpoint_path.stem.lower() or "rmbg-2.0" in checkpoint_path.stem.lower()
+        sess_options.graph_optimization_level = (
+            ort.GraphOptimizationLevel.ORT_DISABLE_ALL
+            if needs_disable_opt
+            else ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+        )
         sess_options.intra_op_num_threads = 1
         sess_options.inter_op_num_threads = 1
         sess_options.log_severity_level = 3
@@ -186,3 +192,12 @@ class ModelManager:
         self.clear_cache()
         self._executor.shutdown(wait=True)
         logger.info("ModelManager shutdown complete")
+
+    def __enter__(self):
+        """进入上下文"""
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """退出上下文，自动清理资源"""
+        self.shutdown()
+        return False  # 不抑制异常

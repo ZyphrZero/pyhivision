@@ -9,6 +9,7 @@ import numpy as np
 from pydantic import BaseModel, Field, field_validator
 
 from pyhivision.exceptions.errors import ImageTooSmallError
+from pyhivision.schemas.alignment import AlignmentParams
 
 # 钩子函数类型定义
 HookFunction = Callable[[dict[str, Any]], Awaitable[dict[str, Any] | None]]
@@ -89,7 +90,8 @@ class PhotoRequest(BaseModel):
         "modnet_photographic",
         "hivision_modnet",
         "birefnet_lite",
-        "rmbg_1_4",
+        "rmbg_1.4",
+        "rmbg_2.0",
     ] = Field(default="modnet_photographic", description="抠图模型")
 
     detection_model: Literal["mtcnn", "retinaface"] = Field(
@@ -103,11 +105,43 @@ class PhotoRequest(BaseModel):
     layout_params: LayoutParams = Field(
         default_factory=LayoutParams, description="布局参数"
     )
+    alignment_params: AlignmentParams = Field(
+        default_factory=AlignmentParams, description="人脸矫正参数"
+    )
 
     # 处理选项
     change_bg_only: bool = Field(default=False, description="仅换背景（跳过人脸检测）")
     render_hd: bool = Field(default=True, description="是否生成高清照")
-    face_alignment: bool = Field(default=True, description="是否启用人脸角度矫正")
+    render_matting: bool = Field(default=False, description="是否返回抠图结果")
+    enable_matting_fix: bool = Field(
+        default=False, description="是否启用抠图修补（仅对 hivision_modnet 有效）"
+    )
+    add_background: bool = Field(
+        default=True, description="是否添加背景色（False 则返回透明背景的 BGRA 图像）"
+    )
+
+    # 检测选项
+    detection_confidence_threshold: float = Field(
+        default=0.8,
+        ge=0.0,
+        le=1.0,
+        description="人脸检测置信度阈值（低于此值的检测结果将被过滤）",
+    )
+    detection_nms_threshold: float = Field(
+        default=0.3,
+        ge=0.0,
+        le=1.0,
+        description="NMS IoU 阈值（用于过滤重叠的检测框）",
+    )
+    multiple_faces_strategy: Literal["error", "best", "largest"] = Field(
+        default="best",
+        description=(
+            "多人脸处理策略："
+            "error - 检测到多人脸时报错（严格模式）；"
+            "best - 选择置信度最高的人脸；"
+            "largest - 选择面积最大的人脸"
+        ),
+    )
 
     # 处理流程钩子
     hooks: dict[str, HookFunction] = Field(

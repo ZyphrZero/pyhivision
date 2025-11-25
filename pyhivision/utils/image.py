@@ -417,3 +417,78 @@ def detect_head_distance(
         move_value = min_ratio - ratio
         move_pixels = int(move_value * crop_height)
         return (-1, move_pixels)
+
+
+def nms_boxes(
+    boxes: np.ndarray,
+    scores: np.ndarray,
+    iou_threshold: float = 0.3,
+) -> list[int]:
+    """非极大值抑制（NMS）算法
+
+    用于过滤重叠的检测框，保留最优的检测结果。
+
+    Args:
+        boxes: 检测框数组 (N, 4)，格式为 [x1, y1, x2, y2]
+        scores: 置信度数组 (N,)
+        iou_threshold: IoU 阈值，默认 0.3（低于此值的框会被保留）
+
+    Returns:
+        保留的检测框索引列表
+
+    Algorithm:
+        1. 按置信度降序排列
+        2. 选择置信度最高的框
+        3. 计算该框与其他框的 IoU
+        4. 移除 IoU > threshold 的框
+        5. 重复 2-4 直到所有框处理完毕
+
+    Examples:
+        >>> boxes = np.array([[10, 10, 50, 50], [12, 12, 52, 52], [100, 100, 150, 150]])
+        >>> scores = np.array([0.9, 0.8, 0.95])
+        >>> keep = nms_boxes(boxes, scores, iou_threshold=0.3)
+        >>> # 返回 [2, 0]（保留置信度最高的和不重叠的）
+    """
+    if len(boxes) == 0:
+        return []
+
+    # 转换为浮点数
+    boxes = boxes.astype(np.float32)
+    scores = scores.astype(np.float32)
+
+    # 提取坐标
+    x1 = boxes[:, 0]
+    y1 = boxes[:, 1]
+    x2 = boxes[:, 2]
+    y2 = boxes[:, 3]
+
+    # 计算面积
+    areas = (x2 - x1 + 1) * (y2 - y1 + 1)
+
+    # 按置信度降序排列
+    order = scores.argsort()[::-1]
+
+    keep = []
+    while order.size > 0:
+        # 选择置信度最高的框
+        i = order[0]
+        keep.append(i)
+
+        # 计算 IoU
+        xx1 = np.maximum(x1[i], x1[order[1:]])
+        yy1 = np.maximum(y1[i], y1[order[1:]])
+        xx2 = np.minimum(x2[i], x2[order[1:]])
+        yy2 = np.minimum(y2[i], y2[order[1:]])
+
+        w = np.maximum(0.0, xx2 - xx1 + 1)
+        h = np.maximum(0.0, yy2 - yy1 + 1)
+        inter = w * h
+
+        # IoU = 交集 / 并集
+        iou = inter / (areas[i] + areas[order[1:]] - inter)
+
+        # 保留 IoU <= threshold 的框
+        inds = np.where(iou <= iou_threshold)[0]
+        order = order[inds + 1]
+
+    return keep

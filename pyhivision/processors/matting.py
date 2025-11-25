@@ -22,7 +22,8 @@ MattingModelName = Literal[
     "modnet_photographic",
     "hivision_modnet",
     "birefnet_lite",
-    "rmbg_1_4",
+    "rmbg_1.4",
+    "rmbg_2.0",
 ]
 
 
@@ -34,7 +35,8 @@ class MattingProcessor:
         "modnet_photographic": (ModNetPhotographicModel, 512),
         "hivision_modnet": (HivisionModNetModel, 512),
         "birefnet_lite": (BiRefNetModel, 1024),
-        "rmbg_1_4": (RMBGModel, 1024),
+        "rmbg_1.4": (RMBGModel, 1024),
+        "rmbg_2.0": (RMBGModel, 1024),
     }
 
     def __init__(self, model_manager: ModelManager):
@@ -49,12 +51,14 @@ class MattingProcessor:
         self,
         image: np.ndarray,
         model_name: MattingModelName = "modnet_photographic",
+        enable_fix: bool = False,
     ) -> np.ndarray:
         """执行抠图
 
         Args:
             image: 输入图像 (BGR 格式)
             model_name: 模型名称
+            enable_fix: 是否启用抠图修补（仅对 hivision_modnet 有效）
 
         Returns:
             BGRA 图像（带透明通道）
@@ -92,10 +96,60 @@ class MattingProcessor:
         logger.debug(f"Running matting with model: {model_name}")
         result = model.infer(image)
 
+        # 应用修补（可选）
+        if enable_fix and model_name in ["hivision_modnet"]:
+            result = self._hollow_out_fix(result)
+
         return result
 
+    def _hollow_out_fix(self, src: np.ndarray) -> np.ndarray:
+        """修补抠图区域，作为抠图模型精度不够的补充
+
+        Args:
+            src: BGRA 图像
+
+        Returns:
+            修补后的 BGRA 图像
+        """
+        import cv2
+
+        b, g, r, a = cv2.split(src)
+        src_bgr = cv2.merge((b, g, r))
+
+        # Padding
+        add_area = np.zeros((10, a.shape[1]), np.uint8)
+        a = np.vstack((add_area, a, add_area))
+        add_area = np.zeros((a.shape[0], 10), np.uint8)
+        a = np.hstack((add_area, a, add_area))
+
+        # Threshold and erode
+        _, a_threshold = cv2.threshold(a, 127, 255, 0)
+        a_erode = cv2.erode(
+            a_threshold,
+            kernel=cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5)),
+            iterations=3,
+        )
+
+        # Find contours
+        contours, hierarchy = cv2.findContours(
+            a_erode, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
+        )
+        contours = [x for x in contours]
+        contours.sort(key=lambda c: cv2.contourArea(c), reverse=True)
+
+        # Draw contour
+        a_contour = cv2.drawContours(np.zeros(a.shape, np.uint8), contours[0], -1, 255, 2)
+
+        # Flood fill
+        h, w = a.shape[:2]
+        mask = np.zeros([h + 2, w + 2], np.uint8)
+        cv2.floodFill(a_contour, mask=mask, seedPoint=(0, 0), newVal=255)
+        a = cv2.add(a, 255 - a_contour)
+
+        return cv2.merge((src_bgr, a[10:-10, 10:-10]))
+
     def _get_weight_path(self, filename: str) -> Path:
-        """获取权重文件路径
+        """获取权重文件路径，如果不存在则提示或自动下载
 
         Args:
             filename: 模型权重文件名
@@ -105,12 +159,40 @@ class MattingProcessor:
 
         Raises:
             ValueError: 如果 matting_models_dir 未配置
+            FileNotFoundError: 如果模型文件不存在且未启用自动下载
         """
+        from pyhivision.utils.download import download_model, get_default_models_dir
+
         models_dir = self.model_manager.settings.matting_models_dir
         if models_dir is None:
-            raise ValueError(
-                "抠图模型目录未配置。请在创建 SDK 实例时设置 matting_models_dir:\n"
-                "  settings = create_settings(matting_models_dir='/path/to/matting/models')\n"
-                "  或设置环境变量: HIVISION_MATTING_MODELS_DIR=/path/to/matting/models"
-            )
-        return models_dir / filename
+            models_dir = get_default_models_dir() / "matting"
+
+        model_path = models_dir / filename
+
+        # 检查文件是否存在
+        if not model_path.exists():
+            model_name = next((k for k, v in self.model_manager.settings.matting_model_files.items() if v == filename), None)
+
+            if self.model_manager.settings.auto_download_models:
+                logger.info(f"模型文件不存在，自动下载: {filename}")
+                return download_model(model_name, "matting", models_dir.parent)
+            else:
+                raise FileNotFoundError(
+                    f"\n{'='*60}\n"
+                    f"❌ 模型文件不存在: {model_path.name}\n"
+                    f"{'='*60}\n\n"
+                    f"💡 推荐方式（最简单）：\n"
+                    f"   在命令行运行：\n"
+                    f"   $ pyhivision install {model_name}\n\n"
+                    f"📦 其他方式：\n"
+                    f"   1. 在代码中下载：\n"
+                    f"      from pyhivision import download_model\n"
+                    f"      download_model('{model_name}', 'matting')\n\n"
+                    f"   2. 启用自动下载：\n"
+                    f"      settings = create_settings(auto_download_models=True)\n\n"
+                    f"   3. 下载所有模型：\n"
+                    f"      $ pyhivision install --all\n"
+                    f"{'='*60}\n"
+                )
+
+        return model_path
