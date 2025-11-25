@@ -47,6 +47,21 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["pyhivision"]
 
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "examples/",
+    "tests/",
+    ".github/",
+    ".vscode/",
+    "*.md",
+]
+include = [
+    "pyhivision/",
+    "README.md",
+    "LICENSE",
+    "pyproject.toml",
+]
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"
