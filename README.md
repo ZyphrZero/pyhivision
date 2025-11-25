@@ -72,12 +72,12 @@ pip install "pyhivision[gpu]"
 **方式 1：使用 CLI 命令（推荐）**
 
 ```bash
-# 下载常用模型
+# 下载常用模型(推荐)
 pyhivision install
 
 # 下载指定模型
-pyhivision install modnet_photographic
-pyhivision install rmbg_2.0_fp16
+pyhivision install birefnet_lite
+pyhivision install rmbg_1.4
 
 # 下载所有模型
 pyhivision install --all
@@ -433,7 +433,7 @@ result.face_info       # 人脸信息
 | `hivision_modnet` | HiVision 优化版 | `pyhivision install hivision_modnet` |
 | `birefnet_lite` | BiRefNet 轻量版 | `pyhivision install birefnet_lite` |
 | `rmbg_1.4` | RMBG 1.4 版本 | `pyhivision install rmbg_1.4` |
-| `rmbg_2.0_fp16` | RMBG 2.0 FP16 | `pyhivision install rmbg_2.0_fp16` |
+| `rmbg_2.0` | RMBG 2.0 Q4F16 量化版本 | `pyhivision install rmbg_2.0` |
 
 </td>
 <td width="50%">
@@ -449,7 +449,7 @@ result.face_info       # 人脸信息
 </tr>
 </table>
 
-> 💡 **提示**：RMBG 2.0 模型需要禁用 ONNX Runtime 图优化，SDK 已自动处理
+> 💡 **提示**：RMBG 2.0 量化模型需要禁用 ONNX Runtime 图优化，SDK 已自动处理
 
 ---
 
