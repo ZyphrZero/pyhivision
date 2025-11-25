@@ -2,6 +2,7 @@
 
 """Data models"""
 
+from pyhivision.schemas.alignment import AlignmentParams, AlignmentResult
 from pyhivision.schemas.config import (
     DetectionModelConfig,
     MattingModelConfig,
@@ -17,6 +18,8 @@ __all__ = [
     'PhotoRequest',
     'BeautyParams',
     'LayoutParams',
+    'AlignmentParams',
+    'AlignmentResult',
     'PhotoResult',
     'FaceInfo',
     'ProcessingStats',

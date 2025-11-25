@@ -3,6 +3,7 @@
 """Processors"""
 
 from pyhivision.processors.adjustment import AdjustmentProcessor
+from pyhivision.processors.alignment import AlignmentProcessor
 from pyhivision.processors.background import BackgroundProcessor
 from pyhivision.processors.beauty import BeautyProcessor
 from pyhivision.processors.detection import DetectionProcessor
@@ -16,6 +17,7 @@ __all__ = [
     'MattingProcessor',
     'DetectionProcessor',
     'AdjustmentProcessor',
+    'AlignmentProcessor',
     'BeautyProcessor',
     'BackgroundProcessor',
     'WatermarkProcessor',

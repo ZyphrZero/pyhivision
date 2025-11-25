@@ -31,20 +31,33 @@ class MTCNNModel(BaseDetectionModel):
         """MTCNN 不需要特殊后处理"""
         return output
 
-    def detect(self, image: np.ndarray, scale: int = 2) -> FaceInfo:
-        """检测人脸
+    def detect(
+        self,
+        image: np.ndarray,
+        scale: int = 2,
+        multiple_faces_strategy: str = "best",
+    ) -> FaceInfo:
+        """检测人脸（支持多人脸策略）
 
         Args:
             image: 输入图像 (BGR 格式)
             scale: 缩小比例（加速检测）
+            multiple_faces_strategy: 多人脸处理策略
+                - "error": 检测到多人脸时报错（严格模式）
+                - "best": 选择置信度最高的人脸（默认）
+                - "largest": 选择面积最大的人脸
 
         Returns:
             人脸信息
 
         Raises:
             NoFaceDetectedError: 未检测到人脸
-            MultipleFacesDetectedError: 检测到多个人脸
+            MultipleFacesDetectedError: 检测到多人脸且策略为 "error"
         """
+        from pyhivision.utils.logger import get_logger
+
+        logger = get_logger("models.detection.mtcnn")
+
         detector = self.get_session()
 
         h, w = image.shape[:2]
@@ -64,8 +77,30 @@ class MTCNNModel(BaseDetectionModel):
         if len(faces) == 0:
             raise NoFaceDetectedError()
 
+        # 多人脸策略处理
         if len(faces) > 1:
-            raise MultipleFacesDetectedError(len(faces))
+            num_faces = len(faces)  # 记录原始数量
+            if multiple_faces_strategy == "error":
+                # 严格模式：报错
+                raise MultipleFacesDetectedError(num_faces)
+            elif multiple_faces_strategy == "best":
+                # 选择置信度最高的
+                confidences = [face[4] for face in faces]
+                best_idx = np.argmax(confidences)
+                faces = [faces[best_idx]]
+                landmarks = [landmarks[best_idx]]
+                logger.warning(
+                    f"检测到 {num_faces} 个人脸，选择置信度最高的 (confidence={confidences[best_idx]:.3f})"
+                )
+            elif multiple_faces_strategy == "largest":
+                # 选择面积最大的
+                areas = [(face[2] - face[0]) * (face[3] - face[1]) for face in faces]
+                largest_idx = np.argmax(areas)
+                faces = [faces[largest_idx]]
+                landmarks = [landmarks[largest_idx]]
+                logger.warning(
+                    f"检测到 {num_faces} 个人脸，选择面积最大的 (area={areas[largest_idx]:.0f})"
+                )
 
         # 恢复坐标（如果使用了缩放）
         face = faces[0]
@@ -87,6 +122,7 @@ class MTCNNModel(BaseDetectionModel):
 
         # 计算置信度（MTCNN 返回的是分数）
         confidence = float(face[4]) if len(face) > 4 else 1.0
+        confidence = max(0.0, min(confidence, 1.0))  # 限制到 [0.0, 1.0]
 
         return FaceInfo(
             x=int(face[0]),
