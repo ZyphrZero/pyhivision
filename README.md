@@ -67,6 +67,50 @@ pip install "pyhivision[dev]"
 pip install "pyhivision[gpu]"
 ```
 
+### 下载模型
+
+**方式 1：使用 CLI 命令（推荐）**
+
+```bash
+# 下载常用模型
+pyhivision install
+
+# 下载指定模型
+pyhivision install modnet_photographic
+pyhivision install rmbg_2.0_fp16
+
+# 下载所有模型
+pyhivision install --all
+
+# 查看可用模型
+pyhivision list
+
+# 查看模型目录
+pyhivision info
+```
+
+**方式 2：在代码中下载**
+
+```python
+from pyhivision import download_model
+
+# 下载抠图模型
+download_model("modnet_photographic", "matting")
+
+# 下载检测模型
+download_model("retinaface", "detection")
+```
+
+**方式 3：启用自动下载（开发环境）**
+
+```python
+settings = create_settings(auto_download_models=True)
+sdk = IDPhotoSDK.create(settings=settings)
+# 使用模型时自动下载（如果不存在）
+```
+
+> 💡 **提示**：模型默认下载到 `~/.pyhivision/` 目录（Windows: `C:\Users\<用户名>\.pyhivision\`）
+
 ### 基本使用
 
 ```python
@@ -76,8 +120,8 @@ from pyhivision import IDPhotoSDK, PhotoRequest, create_settings
 def main():
     # 配置模型路径
     settings = create_settings(
-        matting_models_dir="~/.pyhivision/models/matting",
-        detection_models_dir="~/.pyhivision/models/detection",  # MTCNN 不需要
+        matting_models_dir="~/.pyhivision/matting",
+        detection_models_dir="~/.pyhivision/detection",  # MTCNN 不需要
     )
 
     # 创建 SDK 实例
@@ -121,8 +165,8 @@ from pyhivision import create_settings
 # 基础配置
 settings = create_settings(
     # 模型路径（必需）
-    matting_models_dir="~/.pyhivision/models/matting",      # 抠图模型目录
-    detection_models_dir="~/.pyhivision/models/detection",  # 检测模型目录（MTCNN 除外）
+    matting_models_dir="~/.pyhivision/matting",      # 抠图模型目录
+    detection_models_dir="~/.pyhivision/detection",  # 检测模型目录（MTCNN 除外）
 
     # 性能配置
     enable_gpu=False,          # 是否启用 GPU
@@ -138,8 +182,8 @@ settings = create_settings(
 
 ```bash
 # 模型路径（必需）
-export HIVISION_MATTING_MODELS_DIR=~/.pyhivision/models/matting
-export HIVISION_DETECTION_MODELS_DIR=~/.pyhivision/models/detection
+export HIVISION_MATTING_MODELS_DIR=~/.pyhivision/matting
+export HIVISION_DETECTION_MODELS_DIR=~/.pyhivision/detection
 
 # 性能配置
 export HIVISION_ENABLE_GPU=true
@@ -172,13 +216,25 @@ export HIVISION_LOG_LEVEL=DEBUG
 <td><code>matting_models_dir</code></td>
 <td>Path/str/None</td>
 <td>None</td>
-<td><strong>⚠️ 抠图模型目录（必需）</strong></td>
+<td>抠图模型目录（默认：<code>~/.pyhivision/matting</code>）</td>
 </tr>
 <tr>
 <td><code>detection_models_dir</code></td>
 <td>Path/str/None</td>
 <td>None</td>
-<td>检测模型目录（MTCNN 除外）</td>
+<td>检测模型目录（默认：<code>~/.pyhivision/detection</code>）</td>
+</tr>
+<tr>
+<td><code>auto_download_models</code></td>
+<td>bool</td>
+<td>False</td>
+<td>是否自动下载缺失的模型</td>
+</tr>
+<tr>
+<td><code>download_all_models</code></td>
+<td>bool</td>
+<td>False</td>
+<td>是否在初始化时下载所有模型</td>
 </tr>
 <tr>
 <td><code>enable_gpu</code></td>
@@ -213,7 +269,7 @@ export HIVISION_LOG_LEVEL=DEBUG
 </tbody>
 </table>
 
-> 💡 **提示**：模型路径由上层应用控制，SDK 不提供默认路径。推荐使用用户目录：`~/.pyhivision/models/`
+> 💡 **提示**：未配置模型目录时，SDK 会使用默认目录 `~/.pyhivision/`
 
 ---
 
@@ -371,26 +427,29 @@ result.face_info       # 人脸信息
 
 #### 🎨 抠图模型
 
-| 模型名称 | 说明 |
-|---------|------|
-| `modnet_photographic` | 通用摄影抠图（官方权重） |
-| `hivision_modnet` | HiVision 优化版 |
-| `birefnet_lite` | BiRefNet 轻量版 |
-| `rmbg_1_4` | RMBG 1.4 版本 |
+| 模型名称 | 说明 | 下载命令 |
+|---------|------|---------|
+| `modnet_photographic` | 通用摄影抠图（推荐） | `pyhivision install modnet_photographic` |
+| `hivision_modnet` | HiVision 优化版 | `pyhivision install hivision_modnet` |
+| `birefnet_lite` | BiRefNet 轻量版 | `pyhivision install birefnet_lite` |
+| `rmbg_1.4` | RMBG 1.4 版本 | `pyhivision install rmbg_1.4` |
+| `rmbg_2.0_fp16` | RMBG 2.0 FP16 | `pyhivision install rmbg_2.0_fp16` |
 
 </td>
 <td width="50%">
 
 #### 👤 人脸检测模型
 
-| 模型名称 | 说明 |
-|---------|------|
-| `mtcnn` | MTCNN（内置权重） ✅ |
-| `retinaface` | RetinaFace（需配置路径） |
+| 模型名称 | 说明 | 下载命令 |
+|---------|------|---------|
+| `mtcnn` | MTCNN（内置权重） ✅ | 无需下载 |
+| `retinaface` | RetinaFace | `pyhivision install retinaface` |
 
 </td>
 </tr>
 </table>
+
+> 💡 **提示**：RMBG 2.0 模型需要禁用 ONNX Runtime 图优化，SDK 已自动处理
 
 ---
 
