@@ -2,7 +2,7 @@
 
 """PyHiVision - 高性能证件照处理 SDK"""
 
-__version__ = '1.1.0'
+__version__ = '1.2.0'
 __author__ = 'FastParse Team'
 
 # Core components
