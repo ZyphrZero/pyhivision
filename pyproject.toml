@@ -29,6 +29,9 @@ dependencies = [
 Repository = "https://github.com/ZyphrZero/pyhivision"
 Issues = "https://github.com/ZyphrZero/pyhivision/issues"
 
+[project.scripts]
+pyhivision = "pyhivision.cli:main"
+
 [project.optional-dependencies]
 gpu = ["onnxruntime-gpu>=1.23.2"]
 dev = [

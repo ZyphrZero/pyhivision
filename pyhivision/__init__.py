@@ -24,6 +24,9 @@ from pyhivision.exceptions.errors import (
 from pyhivision.schemas.request import BeautyParams, LayoutParams, PhotoRequest
 from pyhivision.schemas.response import FaceInfo, PhotoResult
 
+# Utils
+from pyhivision.utils.download import download_model, download_all_models, get_default_models_dir
+
 __all__ = [
     '__version__',
     # Core API
@@ -38,6 +41,10 @@ __all__ = [
     'FaceInfo',
     'BeautyParams',
     'LayoutParams',
+    # Utils
+    'download_model',
+    'download_all_models',
+    'get_default_models_dir',
     # Exceptions
     'HivisionError',
     'ModelLoadError',

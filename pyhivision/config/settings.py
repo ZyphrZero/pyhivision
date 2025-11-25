@@ -29,12 +29,13 @@ DEFAULT_MATTING_MODEL_FILES = {
     "modnet_photographic": "modnet_photographic_portrait_matting.onnx",
     "hivision_modnet": "hivision_modnet.onnx",
     "birefnet_lite": "birefnet-v1-lite.onnx",
-    "rmbg_1_4": "rmbg-1.4.onnx",
+    "rmbg_1.4": "rmbg_1.4.onnx",
+    "rmbg_2.0": "rmbg_2.0_q4f16.onnx",
 }
 
 DEFAULT_DETECTION_MODEL_FILES = {
     "mtcnn": None,  # MTCNN 使用内置权重
-    "retinaface": "retinaface-resnet50.onnx",
+    "retinaface": "retinaface_resnet50.onnx",
 }
 
 
@@ -57,6 +58,10 @@ class HivisionSettings(BaseSettings):
     num_threads: int = Field(default=4, ge=1, le=32, description="ONNX Runtime 线程数")
     model_cache_size: int = Field(default=3, ge=1, le=10, description="模型缓存数量上限")
 
+    # 模型下载配置
+    auto_download_models: bool = Field(default=False, description="是否自动下载缺失的模型")
+    download_all_models: bool = Field(default=False, description="是否在初始化时下载所有模型")
+
     # 图像处理配置
     max_image_size: int = Field(default=2000, ge=500, le=4000, description="图像最大边长")
     matting_ref_size: int = Field(default=512, description="抠图模型参考尺寸")
@@ -78,14 +83,14 @@ class HivisionSettings(BaseSettings):
         default=None,
         description=(
             "抠图模型权重目录（由上层应用提供，可通过环境变量 HIVISION_MATTING_MODELS_DIR 设置）\n"
-            "建议路径：~/.pyhivision/models/matting 或应用程序数据目录"
+            "建议路径：~/.pyhivision/matting 或应用程序数据目录"
         ),
     )
     detection_models_dir: Path | str | None = Field(
         default=None,
         description=(
             "检测模型权重目录（由上层应用提供，可通过环境变量 HIVISION_DETECTION_MODELS_DIR 设置）\n"
-            "建议路径：~/.pyhivision/models/detection 或应用程序数据目录\n"
+            "建议路径：~/.pyhivision/detection 或应用程序数据目录\n"
             "注意：MTCNN 使用内置权重，不需要此目录"
         ),
     )
