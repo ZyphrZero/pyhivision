@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 """自定义布局示例 - 调整人脸位置"""
 
+from pathlib import Path
+
 import cv2
+
 from pyhivision import IDPhotoSDK, LayoutParams, PhotoRequest, create_settings
 
 
 def main():
     settings = create_settings(
-        matting_models_dir="~/.pyhivision/models/matting",
+        matting_models_dir="~/.pyhivision/matting",
     )
     sdk = IDPhotoSDK.create(settings=settings)
 
@@ -28,9 +31,12 @@ def main():
     )
 
     result = sdk.process_single(request)
-    cv2.imwrite("output_custom_layout.jpg", result.standard)
 
-    print(f"✅ 自定义布局完成")
+    output_dir = Path("examples/output/04_layout")
+    output_dir.mkdir(parents=True, exist_ok=True)
+    cv2.imwrite(str(output_dir / "output_custom_layout.jpg"), result.standard)
+
+    print("自定义布局完成")
 
 
 if __name__ == "__main__":

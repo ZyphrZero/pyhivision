@@ -1,15 +1,18 @@
 #!/usr/bin/env python
 """基础使用示例 - 生成标准证件照"""
 
+from pathlib import Path
+
 import cv2
+
 from pyhivision import IDPhotoSDK, PhotoRequest, create_settings
 
 
 def main():
     # 配置模型路径
     settings = create_settings(
-        matting_models_dir="~/.pyhivision/models/matting",
-        detection_models_dir="~/.pyhivision/models/detection",
+        matting_models_dir="~/.pyhivision/matting",
+        detection_models_dir="~/.pyhivision/detection",
     )
 
     # 创建 SDK 实例
@@ -22,8 +25,8 @@ def main():
     request = PhotoRequest(
         image=image,
         size=(413, 295),  # 一寸照尺寸
-        background_color=(255, 0, 0),  # 蓝色背景 (BGR)
-        matting_model="modnet_photographic",
+        background_color=(206, 139, 98),  # 蓝色背景 (BGR)
+        matting_model="hivision_modnet",  # 使用 hivision_modnet 模型
         detection_model="mtcnn",
     )
 
@@ -31,11 +34,14 @@ def main():
     result = sdk.process_single(request)
 
     # 保存结果
-    cv2.imwrite("output_standard.jpg", result.standard)
-    if result.hd:
-        cv2.imwrite("output_hd.jpg", result.hd)
+    output_dir = Path("examples/output/01_basic_usage")
+    output_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"✅ 处理完成，耗时: {result.processing_time_ms:.2f}ms")
+    cv2.imwrite(str(output_dir / "output_standard.jpg"), result.standard)
+    if result.hd is not None:
+        cv2.imwrite(str(output_dir / "output_hd.jpg"), result.hd)
+
+    print(f"处理完成，耗时: {result.processing_time_ms:.2f}ms")
 
 
 if __name__ == "__main__":

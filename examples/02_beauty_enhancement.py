@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 """美颜增强示例 - 使用美颜参数"""
 
+from pathlib import Path
+
 import cv2
+
 from pyhivision import BeautyParams, IDPhotoSDK, PhotoRequest, create_settings
 
 
 def main():
     settings = create_settings(
-        matting_models_dir="~/.pyhivision/models/matting",
+        matting_models_dir="~/.pyhivision/matting",
     )
     sdk = IDPhotoSDK.create(settings=settings)
 
@@ -24,14 +27,17 @@ def main():
     request = PhotoRequest(
         image=image,
         size=(413, 295),
-        background_color=(67, 142, 219),  # 蓝底
+        background_color=(206, 139, 98),  # 蓝底
         beauty_params=beauty,
     )
 
     result = sdk.process_single(request)
-    cv2.imwrite("output_beauty.jpg", result.standard)
 
-    print(f"✅ 美颜处理完成")
+    output_dir = Path("examples/output/02_beauty")
+    output_dir.mkdir(parents=True, exist_ok=True)
+    cv2.imwrite(str(output_dir / "output_beauty.jpg"), result.standard)
+
+    print("美颜处理完成")
 
 
 if __name__ == "__main__":

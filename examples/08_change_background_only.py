@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 """仅换背景示例 - 跳过人脸检测，仅更换背景"""
 
+from pathlib import Path
+
 import cv2
+
 from pyhivision import IDPhotoSDK, PhotoRequest, create_settings
 
 
 def main():
     settings = create_settings(
-        matting_models_dir="~/.pyhivision/models/matting",
+        matting_models_dir="~/.pyhivision/matting",
     )
     sdk = IDPhotoSDK.create(settings=settings)
 
@@ -23,9 +26,12 @@ def main():
     )
 
     result = sdk.process_single(request)
-    cv2.imwrite("output_bg_only.jpg", result.standard)
 
-    print("✅ 背景更换完成")
+    output_dir = Path("examples/output/08_change_bg")
+    output_dir.mkdir(parents=True, exist_ok=True)
+    cv2.imwrite(str(output_dir / "output_bg_only.jpg"), result.standard)
+
+    print("背景更换完成")
 
 
 if __name__ == "__main__":

@@ -30,7 +30,7 @@ pip install -e .
 确保已下载所需的模型文件到指定目录：
 
 ```
-~/.pyhivision/models/
+~/.pyhivision/
 ├── matting/
 │   ├── modnet_photographic_portrait_matting.onnx
 │   └── ...
@@ -78,8 +78,8 @@ background_color = (0, 255, 0)      # 绿色
 from pyhivision import create_settings
 
 settings = create_settings(
-    matting_models_dir="~/.pyhivision/models/matting",
-    detection_models_dir="~/.pyhivision/models/detection",
+    matting_models_dir="~/.pyhivision/matting",
+    detection_models_dir="~/.pyhivision/detection",
     enable_gpu=False,
     num_threads=4,
 )
