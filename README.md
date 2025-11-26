@@ -21,10 +21,6 @@
 
 PyHiVision 是一个专业级的证件照处理 SDK，集成多种先进的 AI 模型，为证件照制作、人像处理和批量照片编辑提供完整的解决方案。
 
-<table>
-<tr>
-<td width="50%">
-
 ### ✨ 核心特性
 
 - 🚀 **高性能架构** - 简洁高效的同步处理管线
@@ -35,9 +31,6 @@ PyHiVision 是一个专业级的证件照处理 SDK，集成多种先进的 AI �
 - 🔧 **灵活配置** - 环境变量、配置文件、代码配置
 - 🛡️ **类型安全** - 完整类型注解与数据验证
 
-</td>
-<td width="50%">
-
 ### 🎯 适用场景
 
 - 📸 证件照在线制作平台
@@ -45,10 +38,6 @@ PyHiVision 是一个专业级的证件照处理 SDK，集成多种先进的 AI �
 - 👤 人脸识别与美颜应用
 - 🤖 图像自动化处理服务
 - 🎨 AI 驱动的图像编辑工具
-
-</td>
-</tr>
-</table>
 
 ---
 
@@ -202,72 +191,17 @@ export HIVISION_LOG_LEVEL=DEBUG
 
 ### 主要配置项
 
-<table>
-<thead>
-<tr>
-<th width="25%">配置项</th>
-<th width="20%">类型</th>
-<th width="15%">默认值</th>
-<th width="40%">说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>matting_models_dir</code></td>
-<td>Path/str/None</td>
-<td>None</td>
-<td>抠图模型目录（默认：<code>~/.pyhivision/matting</code>）</td>
-</tr>
-<tr>
-<td><code>detection_models_dir</code></td>
-<td>Path/str/None</td>
-<td>None</td>
-<td>检测模型目录（默认：<code>~/.pyhivision/detection</code>）</td>
-</tr>
-<tr>
-<td><code>auto_download_models</code></td>
-<td>bool</td>
-<td>False</td>
-<td>是否自动下载缺失的模型</td>
-</tr>
-<tr>
-<td><code>download_all_models</code></td>
-<td>bool</td>
-<td>False</td>
-<td>是否在初始化时下载所有模型</td>
-</tr>
-<tr>
-<td><code>enable_gpu</code></td>
-<td>bool</td>
-<td>False</td>
-<td>是否启用 GPU 加速</td>
-</tr>
-<tr>
-<td><code>num_threads</code></td>
-<td>int</td>
-<td>4</td>
-<td>ONNX Runtime 线程数</td>
-</tr>
-<tr>
-<td><code>model_cache_size</code></td>
-<td>int</td>
-<td>3</td>
-<td>模型缓存数量上限</td>
-</tr>
-<tr>
-<td><code>max_image_size</code></td>
-<td>int</td>
-<td>2000</td>
-<td>图像最大边长</td>
-</tr>
-<tr>
-<td><code>log_level</code></td>
-<td>str</td>
-<td>"INFO"</td>
-<td>日志级别</td>
-</tr>
-</tbody>
-</table>
+| 配置项 | 类型 | 默认值 | 说明 |
+|-------|------|--------|------|
+| `matting_models_dir` | Path/str/None | None | 抠图模型目录（默认：`~/.pyhivision/matting`） |
+| `detection_models_dir` | Path/str/None | None | 检测模型目录（默认：`~/.pyhivision/detection`） |
+| `auto_download_models` | bool | False | 是否自动下载缺失的模型 |
+| `download_all_models` | bool | False | 是否在初始化时下载所有模型 |
+| `enable_gpu` | bool | False | 是否启用 GPU 加速 |
+| `num_threads` | int | 4 | ONNX Runtime 线程数 |
+| `model_cache_size` | int | 3 | 模型缓存数量上限 |
+| `max_image_size` | int | 2000 | 图像最大边长 |
+| `log_level` | str | "INFO" | 日志级别 |
 
 > 💡 **提示**：未配置模型目录时，SDK 会使用默认目录 `~/.pyhivision/`
 
@@ -421,35 +355,35 @@ result.face_info       # 人脸信息
 
 ### 支持的模型
 
-<table>
-<tr>
-<td width="50%">
+#### 🎨 抠图模型对比
 
-#### 🎨 抠图模型
+| 模型名称 | 文件大小 | 推理速度 | 精度 | 特点 |
+|---------|---------|---------|------|------|
+| `modnet_photographic` | 24.7 MB | ⚡⚡⚡⚡ | ⭐⭐⭐ | 通用摄影抠图，速度与精度平衡，对纯色换底适配性更好的抠图模型（推荐） |
+| `hivision_modnet` | 24.7 MB | ⚡⚡⚡⚡ | ⭐⭐⭐ | HiVision 优化版，速度更快 | 
+| `birefnet_lite` | 214 MB | ⚡⚡ | ⭐⭐⭐⭐⭐ | BiRefNet 轻量版，高精度抠图 | 
+| `rmbg_1.4` | 168 MB | ⚡⚡⚡ | ⭐⭐⭐⭐ | RMBG 1.4 版本，通用背景移除 | 
+| `rmbg_2.0` | 223 MB | ⚡⚡ | ⭐⭐⭐⭐⭐ | RMBG 2.0 量化版，质量高推理速度慢 | 
 
-| 模型名称 | 说明 | 下载命令 |
-|---------|------|---------|
-| `modnet_photographic` | 通用摄影抠图（推荐） | `pyhivision install modnet_photographic` |
-| `hivision_modnet` | HiVision 优化版 | `pyhivision install hivision_modnet` |
-| `birefnet_lite` | BiRefNet 轻量版 | `pyhivision install birefnet_lite` |
-| `rmbg_1.4` | RMBG 1.4 版本 | `pyhivision install rmbg_1.4` |
-| `rmbg_2.0` | RMBG 2.0 Q4F16 量化版本 | `pyhivision install rmbg_2.0` |
+#### 👤 人脸检测模型对比
 
-</td>
-<td width="50%">
+| 模型名称 | 文件大小 | 推理速度 | 精度 | 特点 |
+|---------|---------|---------|------|------|
+| `mtcnn` ⭐ | 内置 | ⚡⚡⚡⚡ | ⭐⭐⭐⭐ | 多任务级联网络，内置权重（推荐） |
+| `retinaface` | 104 MB | ⚡⚡⚡ | ⭐⭐⭐⭐⭐ | RetinaFace ResNet50，高精度检测 |
 
-#### 👤 人脸检测模型
+#### 📊 模型选择建议
 
-| 模型名称 | 说明 | 下载命令 |
-|---------|------|---------|
-| `mtcnn` | MTCNN（内置权重） ✅ | 无需下载 |
-| `retinaface` | RetinaFace | `pyhivision install retinaface` |
+| 🚀 速度优先 | ⚖️ 平衡选择（推荐） | 🎯 精度优先 |
+|------------|------------------|-----------|
+| **抠图**：`hivision_modnet` | **抠图**：`rmbg_1.4` | **抠图**：`birefnet_lite` / `rmbg_2.0` |
+| **检测**：`mtcnn` | **检测**：`mtcnn` | **检测**：`retinaface` |
+| **场景**：实时处理、批量任务 | **场景**：证件照制作、通用场景 | **场景**：高质量输出、复杂背景 |
 
-</td>
-</tr>
-</table>
-
-> 💡 **提示**：RMBG 2.0 量化模型需要禁用 ONNX Runtime 图优化，SDK 已自动处理
+> 💡 **提示**：
+> - RMBG 2.0 量化模型需要禁用 ONNX Runtime 图优化，SDK 已自动处理
+> - MTCNN 使用内置权重，无需额外下载模型文件
+> - 首次使用模型时会自动加载到内存，后续使用会从缓存读取
 
 ---
 
