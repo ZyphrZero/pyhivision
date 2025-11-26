@@ -7,7 +7,7 @@
 <h3>PyHiVision 证件照处理 SDK</h3>
 
 [![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg)](https://www.python.org/)
-[![Version](https://img.shields.io/badge/version-1.2.1-green.svg)](https://github.com/ZyphrZero/pyhivision/releases)
+[![Version](https://img.shields.io/badge/version-1.2.2-green.svg)](https://github.com/ZyphrZero/pyhivision/releases)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Code style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 

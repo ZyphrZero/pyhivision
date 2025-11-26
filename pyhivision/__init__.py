@@ -1,8 +1,13 @@
 #!/usr/bin/env python
 
-"""PyHiVision - 高性能证件照处理 SDK"""
+"""PyHiVision - 证件照处理 SDK"""
 
-__version__ = '1.2.1'
+try:
+    from importlib.metadata import version
+    __version__ = version("pyhivision")
+except Exception:
+    __version__ = "unknown"
+
 __author__ = 'FastParse Team'
 
 # Core components
