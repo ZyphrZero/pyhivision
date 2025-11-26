@@ -11,6 +11,7 @@ from pyhivision import BeautyParams, IDPhotoSDK, PhotoRequest, create_settings
 def main():
     settings = create_settings(
         matting_models_dir="~/.pyhivision/matting",
+        auto_download_models=True,  # 启用自动下载模型
     )
     sdk = IDPhotoSDK.create(settings=settings)
 
