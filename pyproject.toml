@@ -51,6 +51,7 @@ packages = ["pyhivision"]
 exclude = [
     "examples/",
     "tests/",
+    "scripts/",
     ".github/",
     ".vscode/",
     "*.md",
