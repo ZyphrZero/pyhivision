@@ -25,7 +25,7 @@ def main():
     request = PhotoRequest(
         image=image,
         size=(413, 295),  # 一寸照尺寸
-        background_color=(206, 139, 98),  # 蓝色背景 (BGR)
+        background_color="#438EDB",  # 蓝色背景（支持十六进制、RGB 元组等多种格式）
         matting_model="hivision_modnet",  # 使用 hivision_modnet 模型
         detection_model="mtcnn",
     )

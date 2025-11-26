@@ -65,7 +65,7 @@ class LayoutParams(BaseModel):
     horizontal_flip: bool = Field(default=False, description="是否水平翻转照片")
     clothing_type: str | None = Field(default=None, description="换装类型（future use）")
     clothing_color: tuple[int, int, int] | None = Field(
-        default=None, description="换装颜色 (BGR) (future use)"
+        default=None, description="换装颜色 (使用 PhotoRequest 的 color_format) (future use)"
     )
 
 
@@ -80,9 +80,16 @@ class PhotoRequest(BaseModel):
     # 目标尺寸 (高度, 宽度)
     size: tuple[int, int] = Field(default=(413, 295), description="目标尺寸 (高度, 宽度)")
 
-    # 背景颜色 (BGR 格式)
-    background_color: tuple[int, int, int] = Field(
-        default=(255, 255, 255), description="背景颜色 (BGR)"
+    # 背景颜色 (支持多种格式)
+    background_color: tuple[int, int, int] | str = Field(
+        default=(255, 255, 255),
+        description="背景颜色 (支持 RGB 元组、BGR 元组或十六进制字符串如 '#FF0000')"
+    )
+
+    # 颜色格式选择 (仅当 background_color 为元组时有效)
+    color_format: Literal["RGB", "BGR"] = Field(
+        default="RGB",
+        description="背景颜色格式 (RGB 或 BGR)，仅当 background_color 为元组时有效"
     )
 
     # 模型选择
@@ -183,9 +190,28 @@ class PhotoRequest(BaseModel):
 
     @field_validator("background_color")
     @classmethod
-    def validate_background_color(cls, v: tuple[int, int, int]) -> tuple[int, int, int]:
+    def validate_background_color(cls, v: tuple[int, int, int] | str) -> tuple[int, int, int] | str:
         """验证背景颜色"""
-        for i, c in enumerate(v):
-            if not 0 <= c <= 255:
-                raise ValueError(f"Invalid color value at index {i}: {c}")
-        return v
+        # 如果是字符串（十六进制），验证格式
+        if isinstance(v, str):
+            hex_color = v.lstrip("#")
+            if len(hex_color) != 6:
+                raise ValueError(
+                    f"Invalid hex color format: {v}. Expected format: #RRGGBB or RRGGBB"
+                )
+            try:
+                int(hex_color, 16)
+            except ValueError as e:
+                raise ValueError(f"Invalid hex color format: {v}. {e}") from e
+            return v
+
+        # 如果是元组，验证颜色值范围
+        if isinstance(v, tuple):
+            if len(v) != 3:
+                raise ValueError(f"Color tuple must have 3 values, got {len(v)}")
+            for i, c in enumerate(v):
+                if not 0 <= c <= 255:
+                    raise ValueError(f"Invalid color value at index {i}: {c}")
+            return v
+
+        raise ValueError(f"Invalid color type: {type(v)}. Expected tuple or str")

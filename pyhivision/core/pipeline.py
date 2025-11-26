@@ -17,7 +17,7 @@ from pyhivision.processors.detection import DetectionProcessor
 from pyhivision.processors.matting import MattingProcessor
 from pyhivision.schemas.request import PhotoRequest
 from pyhivision.schemas.response import FaceInfo, PhotoResult
-from pyhivision.utils.image import resize_image_to_max
+from pyhivision.utils.image import parse_color_to_bgr, resize_image_to_max
 from pyhivision.utils.logger import get_logger
 
 logger = get_logger("core.pipeline")
@@ -204,12 +204,15 @@ class PhotoPipeline:
         # 7. 背景替换（可选）
         logger.debug("Step 7: Background replacement")
         if request.add_background:
+            # 智能转换颜色格式为 BGR（OpenCV 格式）
+            bg_color = parse_color_to_bgr(request.background_color, request.color_format)
+
             # 添加背景色：BGRA → BGR
             standard_result = self.background_processor.add_background(
-                standard, request.background_color
+                standard, bg_color
             )
             hd_result = (
-                self.background_processor.add_background(hd, request.background_color)
+                self.background_processor.add_background(hd, bg_color)
                 if request.render_hd
                 else None
             )
