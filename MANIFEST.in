@@ -16,6 +16,7 @@ global-exclude .DS_Store
 # 排除测试和开发文件
 prune tests
 prune examples
+prune scripts
 prune docs
 prune .git
 prune .github
