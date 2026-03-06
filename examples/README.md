@@ -65,8 +65,8 @@ python examples/03_batch_processing.py
 ```python
 # BGR 格式
 background_color = (255, 255, 255)  # 白色
-background_color = (255, 0, 0)      # 蓝色
-background_color = (0, 0, 255)      # 红色
+background_color = (0, 0, 255)      # 蓝色
+background_color = (255, 0, 0)      # 红色
 background_color = (0, 255, 0)      # 绿色
 ```
 

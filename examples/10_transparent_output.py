@@ -58,7 +58,7 @@ def main():
     request_background = PhotoRequest(
         image=image,
         size=(413, 295),
-        background_color=(255, 0, 0),  # 蓝色背景 (BGR)
+        background_color=(0, 0, 255),  # 蓝色背景 (BGR)
         matting_model="modnet_photographic",
         detection_model="mtcnn",
         add_background=True,  # 🔹添加背景

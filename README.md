@@ -123,7 +123,7 @@ def main():
     request = PhotoRequest(
         image=image,
         size=(413, 295),  # 一寸照尺寸
-        background_color=(255, 0, 0),  # 蓝色背景
+        background_color=(0, 0, 255),  # 蓝色背景
         matting_model="modnet_photographic",
         detection_model="mtcnn"
     )
@@ -333,7 +333,7 @@ result = sdk.process_single(request)
 request = PhotoRequest(
     image=image,                          # np.ndarray
     size=(413, 295),                      # 输出尺寸
-    background_color=(255, 0, 0),         # 背景色（默认 RGB 格式，可填写十六进制格式）
+    background_color=(0, 0, 255),         # 背景色（默认 RGB 格式，可填写十六进制格式）
     matting_model="modnet_photographic",  # 抠图模型
     detection_model="mtcnn",              # 检测模型
     beauty_params=BeautyParams(           # 美颜参数（可选）

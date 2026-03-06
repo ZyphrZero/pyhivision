@@ -31,7 +31,7 @@ def process_single_image(sdk, input_path: Path, output_dir: Path):
         request = PhotoRequest(
             image=image,
             size=(413, 295),
-            background_color=(255, 0, 0),  # 蓝底
+            background_color=(0, 0, 255),  # 蓝底
             matting_model="hivision_modnet",
             # matting_model="rmbg_1.4",
         )

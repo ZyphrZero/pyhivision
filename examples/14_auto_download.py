@@ -39,7 +39,7 @@ def method_2_manual():
     request = PhotoRequest(
         image=image,
         size=(413, 295),
-        background_color=(255, 0, 0),
+        background_color=(0, 0, 255),  # 蓝色背景
         matting_model="modnet_photographic",
     )
 
@@ -61,7 +61,7 @@ def method_3_auto():
     request = PhotoRequest(
         image=image,
         size=(413, 295),
-        background_color=(255, 0, 0),
+        background_color=(0, 0, 255),
         matting_model="modnet_photographic",
     )
 

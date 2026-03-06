@@ -23,7 +23,7 @@ def main():
     request = PhotoRequest(
         image=image,
         size=(413, 295),
-        background_color=(255, 0, 0),
+        background_color=(0, 0, 255),
     )
 
     result = sdk.process_single(request)

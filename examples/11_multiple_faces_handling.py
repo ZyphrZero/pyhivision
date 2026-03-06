@@ -48,7 +48,7 @@ def test_best_confidence_mode(sdk, image):
     request = PhotoRequest(
         image=image,
         size=(413, 295),
-        background_color=(255, 0, 0),  # 蓝色背景
+        background_color=(0, 0, 255),  # 蓝色背景
         detection_model="mtcnn",
         multiple_faces_strategy="best",  # 选择置信度最高的人脸（默认）
     )

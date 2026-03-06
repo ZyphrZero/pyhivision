@@ -51,7 +51,7 @@ def main():
     request = PhotoRequest(
         image=image,
         size=(413, 295),  # 一寸照
-        background_color=(255, 0, 0),  # 蓝色背景
+        background_color=(0, 0, 255),  # 蓝色背景
         matting_model="modnet_photographic",
         detection_model="mtcnn",
     )
