@@ -64,35 +64,12 @@ def rgb_to_bgr(image: np.ndarray) -> np.ndarray:
     return cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
 
-def parse_color_to_bgr(
-    color: tuple[int, int, int] | str, color_format: str = "RGB"
-) -> tuple[int, int, int]:
-    """智能解析颜色并转换为 BGR 格式
+def parse_color_to_bgr(color: tuple[int, int, int] | str) -> tuple[int, int, int]:
+    """解析背景色并转换为 OpenCV 使用的 BGR 格式。
 
-    支持多种输入格式：
-    - RGB 元组: (255, 0, 0) + color_format="RGB"
-    - BGR 元组: (0, 0, 255) + color_format="BGR"
-    - 十六进制字符串: "#FF0000" 或 "FF0000"
-
-    Args:
-        color: 颜色值（元组或十六进制字符串）
-        color_format: 元组颜色格式 ("RGB" 或 "BGR")，仅当 color 为元组时有效
-
-    Returns:
-        BGR 格式的颜色元组 (B, G, R)
-
-    Examples:
-        >>> parse_color_to_bgr((255, 0, 0), "RGB")  # 红色
-        (0, 0, 255)
-
-        >>> parse_color_to_bgr((0, 0, 255), "BGR")  # 红色
-        (0, 0, 255)
-
-        >>> parse_color_to_bgr("#FF0000")  # 红色
-        (0, 0, 255)
-
-        >>> parse_color_to_bgr("FF0000")  # 红色
-        (0, 0, 255)
+    支持输入：
+    - RGB 元组: (R, G, B)
+    - 十六进制字符串: "#RRGGBB" 或 "RRGGBB"
     """
     # 处理十六进制字符串
     if isinstance(color, str):
@@ -114,22 +91,12 @@ def parse_color_to_bgr(
         except ValueError as e:
             raise ValueError(f"Invalid hex color format: {color}. {e}") from e
 
-    # 处理元组格式
+    # 处理 RGB 元组格式
     if isinstance(color, tuple) and len(color) == 3:
-        # 验证颜色值范围
         for i, c in enumerate(color):
             if not 0 <= c <= 255:
                 raise ValueError(f"Invalid color value at index {i}: {c}. Must be in range [0, 255]")
-
-        # 根据指定格式转换
-        if color_format.upper() == "RGB":
-            # RGB -> BGR: (R, G, B) -> (B, G, R)
-            return (color[2], color[1], color[0])
-        elif color_format.upper() == "BGR":
-            # 已经是 BGR 格式
-            return color
-        else:
-            raise ValueError(f"Invalid color_format: {color_format}. Must be 'RGB' or 'BGR'")
+        return (color[2], color[1], color[0])
 
     raise ValueError(f"Invalid color type: {type(color)}. Expected tuple or str")
 
@@ -379,7 +346,7 @@ def get_content_box(
         >>> assert y1 == 50 and y2 == 150
     """
     # 数据格式验证
-    if not isinstance(image, np.ndarray) or image.shape[2] != 4:
+    if not isinstance(image, np.ndarray) or image.ndim != 3 or image.shape[2] != 4:
         raise TypeError("输入的图像必须为四通道 np.ndarray 类型矩阵！")
 
     # 规范化 correction_factor

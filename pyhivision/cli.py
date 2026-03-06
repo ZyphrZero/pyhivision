@@ -53,7 +53,7 @@ def cmd_install(args):
     common_models = ["modnet_photographic", "hivision_modnet", "retinaface"]
     for model_name in common_models:
         try:
-            model_type = "matting"
+            model_type = "detection" if model_name == "retinaface" else "matting"
             print(f"\n下载 {model_name}...")
             download_model(model_name, model_type, models_dir, force=args.force)
         except Exception as e:

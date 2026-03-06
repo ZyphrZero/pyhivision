@@ -67,7 +67,7 @@ class PhotoResult(BaseModel):
             "model_info": self.model_info,
             "standard_shape": self.standard.shape,
             "hd_shape": self.hd.shape if self.hd is not None else None,
-            "matting_shape": self.matting.shape,
+            "matting_shape": self.matting.shape if self.matting is not None else None,
         }
 
 

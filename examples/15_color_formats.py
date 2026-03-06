@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""颜色格式示例 - 展示多种颜色输入方式"""
+"""颜色格式示例 - 展示 RGB 元组与十六进制输入方式"""
 
 from pathlib import Path
 
@@ -30,14 +30,13 @@ def main():
     print("PyHiVision 颜色格式示例")
     print("=" * 60)
 
-    # 示例 1: RGB 元组（推荐，默认）
+    # 示例 1: RGB 元组（推荐）
     print("\n1️⃣  RGB 元组格式（推荐）")
     print("   background_color=(255, 0, 0)  # 红色")
     request_rgb = PhotoRequest(
         image=image,
         size=(413, 295),
         background_color=(255, 0, 0),  # 红色 (R, G, B)
-        color_format="RGB",  # 默认值，可省略
         matting_model="hivision_modnet",
         detection_model="mtcnn",
     )
@@ -73,20 +72,19 @@ def main():
     cv2.imwrite(str(output_dir / "03_hex_light_blue.jpg"), result_hex_no_hash.standard)
     print(f"   ✅ 已保存: {output_dir / '03_hex_light_blue.jpg'}")
 
-    # 示例 4: BGR 元组（OpenCV 原生格式）
-    print("\n4️⃣  BGR 元组格式（OpenCV 原生）")
-    print("   background_color=(0, 128, 0), color_format='BGR'  # 绿色")
-    request_bgr = PhotoRequest(
+    # 示例 4: RGB 元组（绿色）
+    print("\n4️⃣  RGB 元组格式（绿色）")
+    print("   background_color=(0, 128, 0)  # 绿色")
+    request_rgb_green = PhotoRequest(
         image=image,
         size=(413, 295),
-        background_color=(0, 128, 0),  # 绿色 (B, G, R)
-        color_format="BGR",
+        background_color=(0, 128, 0),  # 绿色 (R, G, B)
         matting_model="hivision_modnet",
         detection_model="mtcnn",
     )
-    result_bgr = sdk.process_single(request_bgr)
-    cv2.imwrite(str(output_dir / "04_bgr_green.jpg"), result_bgr.standard)
-    print(f"   ✅ 已保存: {output_dir / '04_bgr_green.jpg'}")
+    result_rgb_green = sdk.process_single(request_rgb_green)
+    cv2.imwrite(str(output_dir / "04_rgb_green.jpg"), result_rgb_green.standard)
+    print(f"   ✅ 已保存: {output_dir / '04_rgb_green.jpg'}")
 
     # 示例 5: 常见证件照颜色
     print("\n5️⃣  常见证件照颜色")
@@ -120,7 +118,6 @@ def main():
     print("\n💡 颜色格式使用建议：")
     print("   • RGB 元组：适合程序化生成颜色")
     print("   • 十六进制：适合从设计稿直接复制颜色值")
-    print("   • BGR 元组：适合与 OpenCV 代码集成")
 
 
 if __name__ == "__main__":

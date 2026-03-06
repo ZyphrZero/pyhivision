@@ -39,7 +39,8 @@ class AdjustmentProcessor:
         face_info: FaceInfo,
         target_size: tuple[int, int],
         layout_params: LayoutParams,
-    ) -> tuple[np.ndarray, np.ndarray]:
+        render_hd: bool = True,
+    ) -> tuple[np.ndarray, np.ndarray | None]:
         """调整图像
 
         Args:
@@ -49,12 +50,11 @@ class AdjustmentProcessor:
             layout_params: 布局参数
 
         Returns:
-            (标准照, 高清照)
+            (标准照, 高清照可选)
         """
         # Step1. 准备人脸参数
         x, y = face_info.x, face_info.y
         w, h = face_info.width, face_info.height
-        height, width = image.shape[:2]
         standard_size = target_size  # (高度, 宽度)
         width_height_ratio = standard_size[0] / standard_size[1]
 
@@ -80,7 +80,7 @@ class AdjustmentProcessor:
         cut_image = cv2.resize(cut_image, (crop_size[1], crop_size[0]))
 
         # Step4. 检测裁剪后人像的实际位置
-        y_top, y_bottom, x_left, x_right = get_content_box(
+        y_top, _, x_left, x_right = get_content_box(
             cut_image.astype(np.uint8), model=2, correction_factor=0
         )
 
@@ -122,10 +122,10 @@ class AdjustmentProcessor:
 
         # Step8. 标准照与高清照转换
         result_image_standard = self._standard_photo_resize(result_image, standard_size)
-        result_image_hd, resize_ratio_max = self._resize_image_by_min(
-            result_image, esp=max(600, standard_size[1])
-        )
+        if not render_hd:
+            return result_image_standard, None
 
+        result_image_hd, _ = self._resize_image_by_min(result_image, esp=max(600, standard_size[1]))
         return result_image_standard, result_image_hd
 
     def _idphotos_cut(
@@ -196,7 +196,7 @@ class AdjustmentProcessor:
             (处理后的图像, 下移的像素数)
         """
         height, width, channels = image.shape
-        y_low, y_high, _, _ = get_content_box(image, model=2)
+        _, y_high, _, _ = get_content_box(image, model=2)
 
         # 创建顶部补白（透明区域）
         base = np.zeros((y_high, width, channels), dtype=np.uint8)

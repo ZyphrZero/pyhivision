@@ -5,7 +5,7 @@
 支持斜向重复和居中两种水印样式。
 """
 import math
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 import cv2
@@ -13,7 +13,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont
 
 
-class WatermarkStyle(str, Enum):
+class WatermarkStyle(StrEnum):
     """水印样式"""
 
     STRIPED = "striped"  # 斜向重复

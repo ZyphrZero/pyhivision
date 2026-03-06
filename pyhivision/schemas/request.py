@@ -65,14 +65,14 @@ class LayoutParams(BaseModel):
     horizontal_flip: bool = Field(default=False, description="是否水平翻转照片")
     clothing_type: str | None = Field(default=None, description="换装类型（future use）")
     clothing_color: tuple[int, int, int] | None = Field(
-        default=None, description="换装颜色 (使用 PhotoRequest 的 color_format) (future use)"
+        default=None, description="换装颜色 (RGB 元组) (future use)"
     )
 
 
 class PhotoRequest(BaseModel):
     """ID Photo 处理请求"""
 
-    model_config = {"arbitrary_types_allowed": True}
+    model_config = {"arbitrary_types_allowed": True, "extra": "forbid"}
 
     # 输入图像
     image: np.ndarray = Field(..., description="输入图像 (BGR 格式)")
@@ -83,13 +83,7 @@ class PhotoRequest(BaseModel):
     # 背景颜色 (支持多种格式)
     background_color: tuple[int, int, int] | str = Field(
         default=(255, 255, 255),
-        description="背景颜色 (支持 RGB 元组、BGR 元组或十六进制字符串如 '#FF0000')"
-    )
-
-    # 颜色格式选择 (仅当 background_color 为元组时有效)
-    color_format: Literal["RGB", "BGR"] = Field(
-        default="RGB",
-        description="背景颜色格式 (RGB 或 BGR)，仅当 background_color 为元组时有效"
+        description="背景颜色 (仅支持 RGB 元组或十六进制字符串如 '#FF0000')"
     )
 
     # 模型选择

@@ -63,7 +63,7 @@ python examples/03_batch_processing.py
 ## 🎨 背景颜色参考
 
 ```python
-# BGR 格式
+# RGB 格式
 background_color = (255, 255, 255)  # 白色
 background_color = (0, 0, 255)      # 蓝色
 background_color = (255, 0, 0)      # 红色

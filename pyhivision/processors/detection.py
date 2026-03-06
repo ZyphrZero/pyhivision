@@ -14,6 +14,7 @@ from pyhivision.core.model_manager import ModelManager
 from pyhivision.exceptions.errors import FaceDetectionError
 from pyhivision.models.detection.mtcnn import MTCNNModel
 from pyhivision.models.detection.retinaface import RetinaFaceModel
+from pyhivision.processors.model_path_resolver import resolve_model_checkpoint
 from pyhivision.schemas.config import DetectionModelConfig
 from pyhivision.schemas.response import FaceInfo
 from pyhivision.utils.logger import get_logger
@@ -21,6 +22,7 @@ from pyhivision.utils.logger import get_logger
 logger = get_logger("processors.detection")
 
 DetectionModelName = Literal["mtcnn", "retinaface"]
+MTCNN_SCALE = 2
 
 
 class DetectionProcessor:
@@ -66,55 +68,17 @@ class DetectionProcessor:
         Raises:
             ValueError: 模型名称不支持或配置中缺少对应的模型文件名
         """
-        # 检查模型是否在类注册表中
-        if model_name not in self._model_class_registry:
-            raise ValueError(f"Unknown detection model: {model_name}")
-
-        # 检查配置中是否有该模型的文件名
-        if model_name not in self.model_manager.settings.detection_model_files:
-            raise ValueError(
-                f"Model '{model_name}' not found in configuration. "
-                f"Please add it to detection_model_files in settings."
-            )
-
-        # 从配置读取模型文件名
-        model_cls = self._model_class_registry[model_name]
-        weight_file = self.model_manager.settings.detection_model_files[model_name]
-
-        # 创建模型配置（从 model_manager 获取配置）
-        # weight_file 为 None 表示使用内置权重（如 MTCNN）
-        checkpoint_path = (
-            self._get_weight_path(weight_file) if weight_file else Path(".")
-        )
-
-        config = DetectionModelConfig(
-            name=model_name,
-            checkpoint_path=checkpoint_path,
-            use_gpu=self.model_manager.settings.enable_gpu,
-        )
-
-        # 创建模型实例
-        model = model_cls(config, self.model_manager)
-
-        # 执行检测（根据模型类型传递不同参数）
+        model = self._create_model(model_name)
         logger.debug(f"Running detection with model: {model_name}")
         try:
-            if model_name == "retinaface":
-                # RetinaFace 支持完整的 NMS 配置
-                result = model.detect(
-                    image,
-                    conf_threshold=conf_threshold,
-                    nms_threshold=nms_threshold,
-                    multiple_faces_strategy=multiple_faces_strategy,
-                )
-            else:  # mtcnn
-                # MTCNN 只支持多人脸策略（内置 NMS）
-                result = model.detect(
-                    image,
-                    scale=2,
-                    multiple_faces_strategy=multiple_faces_strategy,
-                )
-            return result
+            return self._run_detection(
+                model=model,
+                model_name=model_name,
+                image=image,
+                conf_threshold=conf_threshold,
+                nms_threshold=nms_threshold,
+                multiple_faces_strategy=multiple_faces_strategy,
+            )
         except ValidationError as e:
             # 转换为业务异常
             error_msg = e.errors()[0]['msg'] if e.errors() else str(e)
@@ -122,51 +86,56 @@ class DetectionProcessor:
                 f"Face detection validation failed: {error_msg}"
             ) from e
 
-    def _get_weight_path(self, filename: str) -> Path:
-        """获取权重文件路径，如果不存在则提示或自动下载
+    def _create_model(self, model_name: DetectionModelName) -> MTCNNModel | RetinaFaceModel:
+        self._validate_model_name(model_name)
+        model_cls = self._model_class_registry[model_name]
+        config = DetectionModelConfig(
+            name=model_name,
+            checkpoint_path=self._resolve_checkpoint_path(model_name),
+            use_gpu=self.model_manager.settings.enable_gpu,
+        )
+        return model_cls(config, self.model_manager)
 
-        Args:
-            filename: 模型权重文件名
+    def _validate_model_name(self, model_name: DetectionModelName) -> None:
+        if model_name not in self._model_class_registry:
+            raise ValueError(f"Unknown detection model: {model_name}")
+        if model_name not in self.model_manager.settings.detection_model_files:
+            raise ValueError(
+                f"Model '{model_name}' not found in configuration. "
+                "Please add it to detection_model_files in settings."
+            )
 
-        Returns:
-            完整的模型权重文件路径
+    def _resolve_checkpoint_path(self, model_name: DetectionModelName) -> Path:
+        weight_file = self.model_manager.settings.detection_model_files[model_name]
+        if weight_file is None:
+            return Path(".")
+        return resolve_model_checkpoint(
+            settings=self.model_manager.settings,
+            model_name=model_name,
+            filename=weight_file,
+            model_type="detection",
+            logger=logger,
+        )
 
-        Raises:
-            ValueError: 如果 detection_models_dir 未配置
-            FileNotFoundError: 如果模型文件不存在且未启用自动下载
-        """
-        from pyhivision.utils.download import download_model, get_default_models_dir
-
-        models_dir = self.model_manager.settings.detection_models_dir
-        if models_dir is None:
-            models_dir = get_default_models_dir() / "detection"
-
-        model_path = models_dir / filename
-
-        # 检查文件是否存在
-        if not model_path.exists():
-            model_name = next((k for k, v in self.model_manager.settings.detection_model_files.items() if v == filename), None)
-
-            if self.model_manager.settings.auto_download_models:
-                logger.info(f"模型文件不存在，自动下载: {filename}")
-                return download_model(model_name, "detection", models_dir.parent)
-            else:
-                raise FileNotFoundError(
-                    f"\n{'='*60}\n"
-                    f"❌ 模型文件不存在: {model_path.name}\n"
-                    f"{'='*60}\n\n"
-                    f"💡 推荐方式（最简单）：\n"
-                    f"   在命令行运行：\n"
-                    f"   $ pyhivision install {model_name}\n\n"
-                    f"📦 其他方式：\n"
-                    f"   1. 在代码中下载：\n"
-                    f"      from pyhivision import download_model\n"
-                    f"      download_model('{model_name}', 'detection')\n\n"
-                    f"   2. 启用自动下载：\n"
-                    f"      settings = create_settings(auto_download_models=True)\n\n"
-                    f"   3. 下载所有模型：\n"
-                    f"      $ pyhivision install --all\n"
-                    f"{'='*60}\n"
-                )
-
-        return model_path
+    def _run_detection(
+        self,
+        model: MTCNNModel | RetinaFaceModel,
+        model_name: DetectionModelName,
+        image: np.ndarray,
+        conf_threshold: float,
+        nms_threshold: float,
+        multiple_faces_strategy: str,
+    ) -> FaceInfo:
+        """按模型能力执行检测。"""
+        if model_name == "retinaface":
+            return model.detect(
+                image,
+                conf_threshold=conf_threshold,
+                nms_threshold=nms_threshold,
+                multiple_faces_strategy=multiple_faces_strategy,
+            )
+        return model.detect(
+            image,
+            scale=MTCNN_SCALE,
+            multiple_faces_strategy=multiple_faces_strategy,
+        )

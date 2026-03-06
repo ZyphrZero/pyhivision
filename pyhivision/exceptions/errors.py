@@ -43,8 +43,9 @@ class ModelNotFoundError(ModelLoadError):
 class FaceDetectionError(HivisionError):
     """人脸检测错误"""
 
-    def __init__(self, message: str, face_count: int):
-        super().__init__(message, details={"face_count": face_count})
+    def __init__(self, message: str, face_count: int | None = None):
+        details = {"face_count": face_count} if face_count is not None else None
+        super().__init__(message, details=details)
         self.face_count = face_count
 
 
