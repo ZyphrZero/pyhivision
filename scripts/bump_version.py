@@ -134,10 +134,10 @@ def main():
         print(f"✅ Version bumped: {current} -> {new_version}")
         print()
         print("Next steps:")
-        print(f"  1. Review changes: git diff")
+        print("  1. Review changes: git diff")
         print(f"  2. Commit: git add -A && git commit -m 'chore: bump version to {new_version}'")
         print(f"  3. Tag: git tag v{new_version}")
-        print(f"  4. Push: git push && git push --tags")
+        print("  4. Push: git push && git push --tags")
 
     except Exception as e:
         print(f"❌ Error: {e}", file=sys.stderr)

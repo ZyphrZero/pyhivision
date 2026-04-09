@@ -1,6 +1,6 @@
 [project]
 name = "pyhivision"
-version = "1.2.2"
+version = "1.2.3"
 description = "PyHiVision 证件照处理 SDK"
 authors = [{ name = "FastParse Team" }]
 readme = "README.md"
